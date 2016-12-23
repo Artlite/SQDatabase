@@ -55,7 +55,15 @@ public enum SQType {
     public static SQType getType(@Nullable final Field field) {
         if (SQValidationHelper.emptyValidate(field)) {
             final Class type = field.getType();
-            if (type == String.class) {
+            if (type.getSimpleName().equalsIgnoreCase("double")) {
+                return DOUBLE;
+            } else if (type.getSimpleName().equalsIgnoreCase("float")) {
+                return FLOAT;
+            } else if (type.getSimpleName().equalsIgnoreCase("int")) {
+                return INTEGER;
+            } else if (type.getSimpleName().equalsIgnoreCase("boolean")) {
+                return BOOLEAN;
+            } else if (type == String.class) {
                 return STRING;
             } else if (type == Float.class) {
                 return FLOAT;

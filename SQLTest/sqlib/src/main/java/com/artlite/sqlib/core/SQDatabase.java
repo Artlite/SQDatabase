@@ -2,14 +2,17 @@ package com.artlite.sqlib.core;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.constants.SQDatabaseType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 import com.artlite.sqlib.model.SQModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +32,6 @@ public final class SQDatabase extends SQLoggableObject {
      * Database
      */
     private final SQDatabaseOpenHelper openHelper;
-    private final SQLiteDatabase database;
 
     /**
      * Constructor for the ApplicationDatabaseHelper
@@ -38,7 +40,6 @@ public final class SQDatabase extends SQLoggableObject {
      */
     protected SQDatabase(@NonNull final Context context) {
         this.openHelper = new SQDatabaseOpenHelper(context);
-        this.database = this.openHelper.getDatabase();
     }
 
     /**
@@ -60,7 +61,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param objects objects
      * @param <T>     objects type
      */
-    public static <T extends SQModel> boolean insert(@Nullable final T... objects) {
+    public synchronized static <T extends SQModel> boolean insert(@Nullable final T... objects) {
         boolean result = true;
         if (validate(objects)) {
             for (final T object : objects) {
@@ -78,13 +79,15 @@ public final class SQDatabase extends SQLoggableObject {
      * @param object objects
      * @param <T>    objects type
      */
-    public static <T extends SQModel> boolean insert(@Nullable final T object) {
+    public synchronized static <T extends SQModel> boolean insert(@Nullable final T object) {
         final String methodName = "boolean insert(object)";
-        ContentValues contentValue = SQModelHelper.getContentValue(object);
-        if ((getDatabase() != null) && (contentValue != null)) {
+        final ContentValues contentValue = SQModelHelper.getContentValue(object);
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        if ((database != null) && (contentValue != null)) {
             try {
                 if (create(object)) {
-                    getDatabase().insert(object.table(), null, contentValue);
+                    database.insertOrThrow(object.table(), null, contentValue);
+                    return true;
                 }
             } catch (Exception ex) {
                 log(null, methodName, ex, null);
@@ -101,15 +104,43 @@ public final class SQDatabase extends SQLoggableObject {
      * @param object objects
      * @param <T>    objects type
      */
-    protected static <T extends SQModel> boolean create(@Nullable final T object) {
+    protected synchronized static <T extends SQModel> boolean create(@Nullable final T object) {
         final String methodName = "boolean create(object)";
         try {
-            getDatabase().execSQL(SQModelHelper.getCreateQuery(object));
+            getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(object));
+            return true;
         } catch (Exception ex) {
             log(null, methodName, ex, null);
             return false;
         }
-        return false;
+    }
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param tableName  table name
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static List<Cursor> selectAll(@Nullable final String tableName,
+                                         @Nullable final Class ownerClass) {
+        final String methodName = "List<Cursor> selectAll(tableName, ownerClass)";
+        List<Cursor> result = new ArrayList<>();
+        try {
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
+            final String[] projection = SQModelHelper.generateProjection(ownerClass);
+            final Cursor cursor = database.query(tableName, projection,
+                    null, null, null, null, null);
+            cursor.moveToFirst();
+            if (cursor.getCount() != 0) {
+                do {
+                    result.add(cursor);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return result;
     }
 
     /**
@@ -118,9 +149,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @return instance of the {@link SQLiteDatabase}
      */
     @Nullable
-    protected static SQLiteDatabase getDatabase() {
-        if ((instance != null) && (instance.database != null)) {
-            return instance.database;
+    protected static SQLiteDatabase getDatabase(@Nullable final SQDatabaseType type) {
+        if ((instance != null) && (instance.openHelper != null)) {
+            return instance.openHelper.getDatabase(type);
         }
         return null;
     }

@@ -20,5 +20,12 @@ public class MainActivity extends AppCompatActivity {
                 SQDatabase.insert(sqlUser);
             }
         });
+        ((Button) findViewById(R.id.button2)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final SQLUser sqlUser = new SQLUser();
+                SQDatabase.selectAll(SQLUser.class.getSimpleName(), SQLUser.class);
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.artlite.sqlib.model;
 
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
 /**
@@ -7,7 +8,7 @@ import android.support.annotation.Nullable;
  * Created by dlernatovich on 12/22/2016.
  */
 
-public interface SQModel {
+public interface SQModel extends BaseColumns {
     /**
      * Method which provide the getting of the SQL table name
      *

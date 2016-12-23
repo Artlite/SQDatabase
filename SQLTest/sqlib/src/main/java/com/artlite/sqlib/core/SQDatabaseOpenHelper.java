@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.constants.SQDatabaseType;
 import com.artlite.sqlib.log.SQLogHelper;
 
 import java.lang.ref.WeakReference;
@@ -80,8 +81,16 @@ final class SQDatabaseOpenHelper extends SQLiteOpenHelper {
      * @return instance of the {@link SQLiteDatabase}
      */
     @Nullable
-    public final SQLiteDatabase getDatabase() {
-        return getWritableDatabase();
+    public final SQLiteDatabase getDatabase(@Nullable final SQDatabaseType type) {
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
+            case WRITE:
+                return getWritableDatabase();
+            default:
+                return getReadableDatabase();
+        }
     }
 
 }

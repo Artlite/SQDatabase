@@ -1,6 +1,7 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.content.ContentValues;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -23,9 +24,10 @@ import java.util.List;
  * Created by dlernatovich on 12/22/2016.
  */
 
-public final class SQModelHelper extends SQModelHelper_Convert {
+public final class SQModelHelper extends SQModelHelper_Projection {
 
     private static final String K_SQL_CREATE_TABLE = "create table if not exists %s (%s)";
+    private static final String K_TYPE_ID = "integer primary key autoincrement";
 
     /**
      * Method which provide the getting of the create tables queries
@@ -64,6 +66,7 @@ public final class SQModelHelper extends SQModelHelper_Convert {
         String fieldsValue = null;
         //Get fields
         if (SQValidationHelper.emptyValidate(object)) {
+            fields.add(String.format("%s %s", BaseColumns._ID, K_TYPE_ID));
             SQAnnotationHelper.annotate(object, new SQAnnotationCallback<T>() {
                 @Override
                 public void onFoundAnnotation(@NonNull final T object,
