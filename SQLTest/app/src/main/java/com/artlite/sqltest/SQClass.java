@@ -22,7 +22,7 @@ public class SQClass implements SQModel {
     @SQField
     private int userCount = SQRandomHelper.generate();
     @SQField
-    private boolean isSpecial = true;
+    boolean isSpecial = true;
     @SQField
     private float floatCount = SQRandomHelper.generate();
     @SQField

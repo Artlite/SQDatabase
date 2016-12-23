@@ -11,6 +11,7 @@ import android.widget.Button;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
+import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqlib.model.SQModel;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final SQClass sqClass = classes.get(classes.size() - 1);
-                sqClass.name = SQRandomHelper.generate(100);
+                sqClass.isSpecial = false;
                 SQDatabase.update(sqClass);
             }
         });
@@ -43,13 +44,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 classes.clear();
+                final SQFilter<Boolean> filter = new SQFilter<Boolean>("isSpecial", false);
                 classes.addAll(SQDatabase.selectAll(SQClass.class,
                         new SQCursorCallback<SQClass>() {
                             @Override
                             public SQClass convert(@NonNull Cursor cursor) {
                                 return new SQClass(cursor);
                             }
-                        }));
+                        }, filter));
                 classes.size();
             }
         });

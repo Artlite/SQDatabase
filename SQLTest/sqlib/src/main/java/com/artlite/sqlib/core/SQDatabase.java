@@ -7,11 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
+import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.constants.SQDatabaseType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
+import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqlib.model.SQModel;
 
 import java.util.ArrayList;
@@ -166,11 +169,12 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel> List<T> selectAll(@Nullable final Class ownerClass,
-                                                        @Nullable final SQCursorCallback<T> callback) {
+    public static <T extends SQModel, K> List<T> selectAll(@Nullable final Class ownerClass,
+                                                           @Nullable final SQCursorCallback<T> callback,
+                                                           @Nullable final SQFilter<K>... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName(), callback));
+            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName(), callback, filters));
         }
         return result;
     }
@@ -182,16 +186,19 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel> List<T> selectAll(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final SQCursorCallback<T> callback) {
+    public static <T extends SQModel, K> List<T> selectAll(@Nullable final Class ownerClass,
+                                                           @Nullable final String tableName,
+                                                           @Nullable final SQCursorCallback<T> callback,
+                                                           @Nullable final SQFilter<K>... filters) {
         final String methodName = "List<Cursor> selectAll(tableName, ownerClass)";
         List<T> result = new ArrayList<>();
         try {
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final String[] projection = SQModelHelper.generateProjection(ownerClass);
+            final String filter = getFilter(filters);
+            final String[] args = getFilterArgs(filters);
             final Cursor cursor = database.query(tableName, projection,
-                    null, null, null, null, null);
+                    filter, args, null, null, null);
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
                 do {
@@ -207,6 +214,56 @@ public final class SQDatabase extends SQLoggableObject {
             log(null, methodName, ex, null);
         }
         return result;
+    }
+
+    /**
+     * Method which provide the getting of the filter query
+     *
+     * @param filters filter objects
+     * @param <T>     objects type
+     * @return filter query
+     */
+    @NonNull
+    protected static <T> String getFilter(@Nullable final SQFilter<T>... filters) {
+        final StringBuilder result = new StringBuilder();
+        List<String> queryList = new ArrayList<>();
+        if (validate(filters)) {
+            for (final SQFilter filter : filters) {
+                if (validate(filter)) {
+                    final String filterValue = filter.getFilter();
+                    if (validate(filterValue)) {
+                        queryList.add(filterValue);
+                    }
+                }
+            }
+        }
+        if (queryList.size() > 0) {
+            result.append(TextUtils.join(", ", queryList));
+        }
+        return result.toString();
+    }
+
+    /**
+     * Method which provide the getting of the filter query
+     *
+     * @param filters filter objects
+     * @param <T>     objects type
+     * @return filter query
+     */
+    @NonNull
+    protected static <T> String[] getFilterArgs(@Nullable final SQFilter<T>... filters) {
+        List<String> queryList = new ArrayList<>();
+        if (validate(filters)) {
+            for (final SQFilter filter : filters) {
+                if (validate(filter)) {
+                    final String filterValue = filter.getFilterArgs();
+                    if (validate(filterValue)) {
+                        queryList.add(filterValue);
+                    }
+                }
+            }
+        }
+        return queryList.toArray(new String[queryList.size()]);
     }
 
     /**
