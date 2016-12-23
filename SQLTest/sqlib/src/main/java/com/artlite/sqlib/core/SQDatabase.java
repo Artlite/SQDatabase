@@ -132,7 +132,7 @@ public final class SQDatabase extends SQLoggableObject {
             final Cursor cursor = database.query(tableName, projection,
                     null, null, null, null, null);
             cursor.moveToFirst();
-            if (cursor.getCount() != 0) {
+            if (cursor.getCount() > 0) {
                 do {
                     result.add(cursor);
                 } while (cursor.moveToNext());
