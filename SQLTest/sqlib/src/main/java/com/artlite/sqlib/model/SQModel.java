@@ -10,6 +10,14 @@ import android.support.annotation.Nullable;
  */
 
 public interface SQModel extends BaseColumns {
+
+    /**
+     * Method which provide the getting of the ID fro {@link SQModel}
+     *
+     * @return id for {@link SQModel}
+     */
+    int id();
+
     /**
      * Method which provide the getting of the SQL table name
      *

@@ -38,6 +38,11 @@ public class SQLUser implements SQModel {
     private final Boolean booleanFalse = false;
 
 
+    @Override
+    public int id() {
+        return 0;
+    }
+
     /**
      * Method which provide the getting of the SQL table name
      *

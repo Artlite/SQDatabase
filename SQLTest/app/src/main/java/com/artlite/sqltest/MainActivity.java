@@ -10,12 +10,15 @@ import android.widget.Button;
 
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.core.SQDatabase;
+import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.model.SQModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private final List<SQClass> classes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +31,25 @@ public class MainActivity extends AppCompatActivity {
                 SQDatabase.insert(sqlUser);
             }
         });
+        ((Button) findViewById(R.id.button3)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final SQClass sqClass = classes.get(classes.size() - 1);
+                sqClass.name = SQRandomHelper.generate(100);
+                SQDatabase.update(sqClass);
+            }
+        });
         ((Button) findViewById(R.id.button2)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final List<SQClass> classes = SQDatabase.selectAll(SQClass.class, new SQCursorCallback<SQClass>() {
-                    @Override
-                    public SQClass convert(@NonNull Cursor cursor) {
-                        return new SQClass(cursor);
-                    }
-                });
+                classes.clear();
+                classes.addAll(SQDatabase.selectAll(SQClass.class,
+                        new SQCursorCallback<SQClass>() {
+                            @Override
+                            public SQClass convert(@NonNull Cursor cursor) {
+                                return new SQClass(cursor);
+                            }
+                        }));
                 classes.size();
             }
         });

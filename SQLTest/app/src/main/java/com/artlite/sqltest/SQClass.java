@@ -16,8 +16,9 @@ import java.util.Date;
 
 public class SQClass implements SQModel {
 
+    private int id;
     @SQField
-    private String name = SQRandomHelper.generate(10);
+    public String name = SQRandomHelper.generate(10);
     @SQField
     private int userCount = SQRandomHelper.generate();
     @SQField
@@ -36,6 +37,11 @@ public class SQClass implements SQModel {
         apply(cursor);
     }
 
+    @Override
+    public int id() {
+        return id;
+    }
+
     @Nullable
     @Override
     public String table() {
@@ -44,6 +50,7 @@ public class SQClass implements SQModel {
 
     @Override
     public void apply(@Nullable Cursor cursor) {
+        id = SQModelHelper.getID(cursor);
         name = SQModelHelper.getString(cursor, "name");
         userCount = SQModelHelper.getInteger(cursor, "userCount");
         isSpecial = SQModelHelper.getBoolean(cursor, "isSpecial");

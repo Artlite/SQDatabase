@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -97,6 +98,50 @@ public final class SQDatabase extends SQLoggableObject {
         }
         return false;
     }
+
+    /**
+     * Method which provide the update of the {@link SQModel} objects list
+     *
+     * @param objects list of {@link SQModel}
+     * @param <T>     objects type
+     * @return update result
+     */
+    public static synchronized <T extends SQModel> boolean update(@Nullable final T... objects) {
+        boolean result = true;
+        if (validate(objects)) {
+            for (final T object : objects) {
+                if (!update(object)) {
+                    result = false;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Method which provide the
+     *
+     * @param object objects
+     * @param <T>    objects type
+     */
+    public synchronized static <T extends SQModel> boolean update(@Nullable final T object) {
+        final String methodName = "boolean update(object)";
+        final ContentValues contentValue = SQModelHelper.getContentValue(object);
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
+        final String[] selectionArgs = {String.valueOf(object.id())};
+        if ((database != null) && (contentValue != null)) {
+            try {
+                database.update(object.table(), contentValue, selection, selectionArgs);
+            } catch (Exception ex) {
+                log(null, methodName, ex, null);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Method which provide the create SQL tables for objects

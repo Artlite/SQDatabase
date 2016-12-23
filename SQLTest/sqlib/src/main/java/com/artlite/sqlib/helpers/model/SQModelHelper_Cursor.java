@@ -1,6 +1,7 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -11,6 +12,24 @@ import java.util.Date;
  */
 
 abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
+
+    /**
+     * Method which provide the getting {@link String} from {@link Cursor}
+     *
+     * @param cursor instance of {@link Cursor}
+     * @return value of {@link String}
+     */
+    @NonNull
+    public static int getID(@Nullable final Cursor cursor) {
+        final String methodName = "String getString(cursor, fieldName)";
+        int result = Integer.MIN_VALUE;
+        try {
+            result = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID));
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return result;
+    }
 
     /**
      * Method which provide the getting {@link String} from {@link Cursor}
@@ -99,7 +118,7 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
      * @return value of {@link Integer}
      */
     public static int getInteger(@Nullable final Cursor cursor,
-                                   @Nullable final String fieldName) {
+                                 @Nullable final String fieldName) {
         final String methodName = "String getDate(cursor, fieldName)";
         int result = 0;
         try {
