@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.artlite.sqlib.core.SQDatabase;
+import com.artlite.sqlib.model.SQModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final SQLUser sqlUser = new SQLUser();
+                final SQModel sqlUser = new SQClass();
                 SQDatabase.insert(sqlUser);
             }
         });
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final SQLUser sqlUser = new SQLUser();
-                SQDatabase.selectAll(SQLUser.class.getSimpleName(), SQLUser.class);
+                SQDatabase.selectAll(SQClass.class);
             }
         });
     }

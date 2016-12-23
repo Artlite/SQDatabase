@@ -141,14 +141,14 @@ public final class SQAnnotationHelper extends SQBaseHelper {
         Object object = null;
         if (SQValidationHelper.emptyValidate(field, type, owner)) {
             try {
-                if (isBoolean(owner, field)) {
+                if (isBoolean(owner, field) && (type == Boolean.class)) {
                     object = new Boolean(field.getBoolean(owner));
-                } else if (isDouble(owner, field)) {
-                    object = new Double(field.getDouble(owner));
-                } else if (isFloat(owner, field)) {
-                    object = new Float(field.getFloat(owner));
-                } else if (isInt(owner, field)) {
+                } else if (isInt(owner, field) && (type == Integer.class)) {
                     object = new Integer(field.getInt(owner));
+                } else if (isDouble(owner, field) && (type == Double.class)) {
+                    object = new Double(field.getDouble(owner));
+                } else if (isFloat(owner, field) && (type == Float.class)) {
+                    object = new Float(field.getFloat(owner));
                 }
             } catch (Exception e) {
                 SQLogHelper.log(null, methodName, e, null);

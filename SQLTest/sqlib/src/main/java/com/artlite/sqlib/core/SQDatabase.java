@@ -87,7 +87,6 @@ public final class SQDatabase extends SQLoggableObject {
             try {
                 if (create(object)) {
                     database.insertOrThrow(object.table(), null, contentValue);
-                    return true;
                 }
             } catch (Exception ex) {
                 log(null, methodName, ex, null);
@@ -108,11 +107,25 @@ public final class SQDatabase extends SQLoggableObject {
         final String methodName = "boolean create(object)";
         try {
             getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(object));
-            return true;
         } catch (Exception ex) {
             log(null, methodName, ex, null);
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static List<Cursor> selectAll(@Nullable final Class ownerClass) {
+        List<Cursor> result = new ArrayList<>();
+        if (ownerClass != null) {
+            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName()));
+        }
+        return result;
     }
 
     /**
@@ -122,8 +135,8 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static List<Cursor> selectAll(@Nullable final String tableName,
-                                         @Nullable final Class ownerClass) {
+    public static List<Cursor> selectAll(@Nullable final Class ownerClass,
+                                         @Nullable final String tableName) {
         final String methodName = "List<Cursor> selectAll(tableName, ownerClass)";
         List<Cursor> result = new ArrayList<>();
         try {
