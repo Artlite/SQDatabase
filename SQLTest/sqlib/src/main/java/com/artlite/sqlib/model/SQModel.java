@@ -1,5 +1,6 @@
 package com.artlite.sqlib.model;
 
+import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
@@ -16,4 +17,11 @@ public interface SQModel extends BaseColumns {
      */
     @Nullable
     String table();
+
+    /**
+     * Method which provide the applying data from {@link Cursor}
+     *
+     * @param cursor instance of {@link Cursor}
+     */
+    void apply(@Nullable final Cursor cursor);
 }

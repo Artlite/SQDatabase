@@ -1,5 +1,6 @@
 package com.artlite.sqltest;
 
+import android.database.Cursor;
 import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.annotations.SQField;
@@ -46,5 +47,10 @@ public class SQLUser implements SQModel {
     @Override
     public String table() {
         return SQLUser.class.getSimpleName();
+    }
+
+    @Override
+    public void apply(@Nullable Cursor cursor) {
+
     }
 }

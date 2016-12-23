@@ -24,7 +24,7 @@ import java.util.List;
  * Created by dlernatovich on 12/22/2016.
  */
 
-public final class SQModelHelper extends SQModelHelper_Projection {
+public final class SQModelHelper extends SQModelHelper_Cursor {
 
     private static final String K_SQL_CREATE_TABLE = "create table if not exists %s (%s)";
     private static final String K_TYPE_ID = "integer primary key autoincrement";

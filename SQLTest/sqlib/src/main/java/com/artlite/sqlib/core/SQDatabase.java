@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.constants.SQDatabaseType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
@@ -120,10 +121,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static List<Cursor> selectAll(@Nullable final Class ownerClass) {
-        List<Cursor> result = new ArrayList<>();
+    public static <T extends SQModel> List<T> selectAll(@Nullable final Class ownerClass,
+                                                        @Nullable final SQCursorCallback<T> callback) {
+        List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName()));
+            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName(), callback));
         }
         return result;
     }
@@ -135,10 +137,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static List<Cursor> selectAll(@Nullable final Class ownerClass,
-                                         @Nullable final String tableName) {
+    public static <T extends SQModel> List<T> selectAll(@Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback) {
         final String methodName = "List<Cursor> selectAll(tableName, ownerClass)";
-        List<Cursor> result = new ArrayList<>();
+        List<T> result = new ArrayList<>();
         try {
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final String[] projection = SQModelHelper.generateProjection(ownerClass);
@@ -147,7 +150,12 @@ public final class SQDatabase extends SQLoggableObject {
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
                 do {
-                    result.add(cursor);
+                    try {
+                        final T object = callback.convert(cursor);
+                        result.add(object);
+                    } catch (Exception ce) {
+                        log(null, methodName, ce, null);
+                    }
                 } while (cursor.moveToNext());
             }
         } catch (Exception ex) {

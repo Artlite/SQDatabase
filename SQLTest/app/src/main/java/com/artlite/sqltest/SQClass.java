@@ -1,10 +1,14 @@
 package com.artlite.sqltest;
 
+import android.database.Cursor;
 import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.annotations.SQField;
+import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.model.SQModel;
+
+import java.util.Date;
 
 /**
  * Created by Artli on 23.12.2016.
@@ -13,17 +17,37 @@ import com.artlite.sqlib.model.SQModel;
 public class SQClass implements SQModel {
 
     @SQField
-    private final String name = SQRandomHelper.generate(10);
+    private String name = SQRandomHelper.generate(10);
     @SQField
-    private final int userCount = SQRandomHelper.generate();
+    private int userCount = SQRandomHelper.generate();
     @SQField
-    private final boolean isSPecial = true;
+    private boolean isSpecial = true;
     @SQField
-    private final float floatCount = SQRandomHelper.generate();
+    private float floatCount = SQRandomHelper.generate();
+    @SQField
+    private Date currentDate = new Date();
+
+    public SQClass() {
+
+    }
+
+    public SQClass(@Nullable final Cursor cursor) {
+        this();
+        apply(cursor);
+    }
 
     @Nullable
     @Override
     public String table() {
         return SQClass.class.getSimpleName();
+    }
+
+    @Override
+    public void apply(@Nullable Cursor cursor) {
+        name = SQModelHelper.getString(cursor, "name");
+        userCount = SQModelHelper.getInteger(cursor, "userCount");
+        isSpecial = SQModelHelper.getBoolean(cursor, "isSpecial");
+        floatCount = SQModelHelper.getFloat(cursor, "floatCount");
+        currentDate = SQModelHelper.getDate(cursor, "currentDate");
     }
 }
