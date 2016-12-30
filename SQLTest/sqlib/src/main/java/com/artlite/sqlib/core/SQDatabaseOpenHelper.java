@@ -12,7 +12,7 @@ import com.artlite.sqlib.log.SQLogHelper;
 import java.lang.ref.WeakReference;
 
 /**
- * Class which provide the create of the instance of the {@link SQDatabaseOpenHelper} for creating of the
+ * Class which provide the init of the instance of the {@link SQDatabaseOpenHelper} for creating of the
  * SQLite database
  * Created by dlernatovich on 12/21/2016.
  */

@@ -28,7 +28,7 @@ public enum SQType {
     private final String name;
 
     /**
-     * Method which provide the create {@link SQType} from name
+     * Method which provide the init {@link SQType} from name
      *
      * @param name {@link SQType} name value
      */

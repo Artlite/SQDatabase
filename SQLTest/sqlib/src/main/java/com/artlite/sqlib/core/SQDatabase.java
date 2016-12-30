@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.constants.SQDatabaseType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class which provide the create of the instance of the {@link SQDatabase} for creating of the
+ * Class which provide the init of the instance of the {@link SQDatabase} for creating of the
  * SQLite database
  * Created by dlernatovich on 12/21/2016.
  */
@@ -48,13 +47,13 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     /**
-     * Method which provide the create of the instance of the {@link SQDatabase}
+     * Method which provide the init of the instance of the {@link SQDatabase}
      *
      * @param context instance of {@link Context}
      * @return created instance
      * @warning SHOULD BE CALL FROM {@link android.app.Application}
      */
-    public static void create(@NonNull final Context context) {
+    public static void init(@NonNull final Context context) {
         if (instance == null) {
             instance = new SQDatabase(context);
         }
@@ -147,7 +146,7 @@ public final class SQDatabase extends SQLoggableObject {
 
 
     /**
-     * Method which provide the create SQL tables for objects
+     * Method which provide the init SQL tables for objects
      *
      * @param object objects
      * @param <T>    objects type
@@ -155,7 +154,8 @@ public final class SQDatabase extends SQLoggableObject {
     protected synchronized static <T extends SQModel> boolean create(@Nullable final T object) {
         final String methodName = "boolean create(object)";
         try {
-            getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(object));
+            getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(getContext(),
+                    object));
         } catch (Exception ex) {
             log(null, methodName, ex, null);
             return false;
@@ -194,7 +194,7 @@ public final class SQDatabase extends SQLoggableObject {
         List<T> result = new ArrayList<>();
         try {
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
-            final String[] projection = SQModelHelper.generateProjection(ownerClass);
+            final String[] projection = SQModelHelper.generateProjection(getContext(), ownerClass);
             final String filter = getFilter(filters);
             final String[] args = getFilterArgs(filters);
             final Cursor cursor = database.query(tableName, projection,
@@ -275,6 +275,22 @@ public final class SQDatabase extends SQLoggableObject {
     protected static SQLiteDatabase getDatabase(@Nullable final SQDatabaseType type) {
         if ((instance != null) && (instance.openHelper != null)) {
             return instance.openHelper.getDatabase(type);
+        }
+        return null;
+    }
+
+    /**
+     * Method which provide the getting of the {@link Context}
+     *
+     * @return instance of {@link Context}
+     */
+    @Nullable
+    protected static Context getContext() {
+        final String methodName = "Context getContext()";
+        try {
+            return instance.openHelper.getContext();
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
         }
         return null;
     }

@@ -13,6 +13,6 @@ public final class CurrentApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SQDatabase.create(this);
+        SQDatabase.init(this);
     }
 }

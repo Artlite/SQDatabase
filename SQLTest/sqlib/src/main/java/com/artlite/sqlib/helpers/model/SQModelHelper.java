@@ -1,6 +1,7 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.text.TextUtils;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.callbacks.SQAnnotationCallback;
 import com.artlite.sqlib.constants.SQType;
+import com.artlite.sqlib.helpers.preference.SQPreferenceHelper;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
 import com.artlite.sqlib.helpers.annotation.SQAnnotationHelper;
 import com.artlite.sqlib.model.SQModel;
@@ -30,18 +32,19 @@ public final class SQModelHelper extends SQModelHelper_Cursor {
     private static final String K_TYPE_ID = "integer primary key autoincrement";
 
     /**
-     * Method which provide the getting of the create tables queries
+     * Method which provide the getting of the init tables queries
      *
      * @param objects objects
      * @param <T>     objects type
      * @return list of queries
      */
     @NonNull
-    public static <T extends SQModel> List<String> getCreateQueries(@Nullable final T... objects) {
+    public static <T extends SQModel> List<String> getCreateQueries(@Nullable final Context context,
+                                                                    @Nullable final T... objects) {
         final List<String> sql = new ArrayList<>();
         if (SQValidationHelper.emptyValidate(objects)) {
             for (final T model : objects) {
-                final String query = getCreateQuery(model);
+                final String query = getCreateQuery(context, model);
                 if (!TextUtils.isEmpty(query)) {
                     sql.add(query);
                 }
@@ -51,21 +54,25 @@ public final class SQModelHelper extends SQModelHelper_Cursor {
     }
 
     /**
-     * Method which provide the getting of the create table query for object
+     * Method which provide the getting of the init table query for object
      *
      * @param object object
      * @param <T>    object type
      * @return query type
      */
     @NonNull
-    public static <T extends SQModel> String getCreateQuery(@Nullable final T object) {
+    public static <T extends SQModel> String getCreateQuery(@Nullable final Context context,
+                                                            @Nullable final T object) {
         //Fields
         final StringBuilder result = new StringBuilder();
         final List<String> fields = new ArrayList<>();
         final String tableName = (object != null) ? object.table() : null;
+        final String tableNamePreferences = String.format("%s_create_fields", tableName);
         String fieldsValue = null;
+        //Get SharedPreferences fields
+        fields.addAll(SQPreferenceHelper.getList(context, tableNamePreferences));
         //Get fields
-        if (SQValidationHelper.emptyValidate(object)) {
+        if (SQValidationHelper.emptyValidate(object) && (fields.size() == 0)) {
             fields.add(String.format("%s %s", BaseColumns._ID, K_TYPE_ID));
             SQAnnotationHelper.annotate(object, new SQAnnotationCallback<T>() {
                 @Override
@@ -78,6 +85,8 @@ public final class SQModelHelper extends SQModelHelper_Cursor {
                     fields.add(String.format("%s %s", name, type));
                 }
             }, SQField.class);
+            //Save SharedPreferences fields
+            SQPreferenceHelper.save(context, fields, tableNamePreferences);
         }
         //Get fields string
         fieldsValue = TextUtils.join(", ", fields);

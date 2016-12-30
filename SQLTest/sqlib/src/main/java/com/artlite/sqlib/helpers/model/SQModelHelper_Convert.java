@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.helpers.convert.SQConvertHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 
 import java.io.ByteArrayInputStream;
@@ -22,11 +23,6 @@ import java.util.Date;
 abstract class SQModelHelper_Convert extends SQLoggableObject {
 
     /**
-     * Constants
-     */
-    private static String K_FORMAT_DATE = "yyyy-MM-dd HH:mm:ss.S";
-
-    /**
      * Method which provide the converting object to bytes
      *
      * @param object object
@@ -35,17 +31,7 @@ abstract class SQModelHelper_Convert extends SQLoggableObject {
     @SuppressLint("NewApi")
     @NonNull
     protected static byte[] convert(@Nullable final Object object) {
-        final String methodName = "byte[] convert(object)";
-        try {
-            try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                 ObjectOutput out = new ObjectOutputStream(bos)) {
-                out.writeObject(object);
-                return bos.toByteArray();
-            }
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return new byte[]{};
+        return SQConvertHelper.convert(object);
     }
 
     /**
@@ -57,16 +43,7 @@ abstract class SQModelHelper_Convert extends SQLoggableObject {
     @SuppressLint("NewApi")
     @Nullable
     protected static Object convert(@Nullable final byte[] bytes) {
-        final String methodName = "Object convert(bytes)";
-        try {
-            try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-                 ObjectInput in = new ObjectInputStream(bis)) {
-                return in.readObject();
-            }
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return null;
+        return SQConvertHelper.convert(bytes);
     }
 
     /**
@@ -77,13 +54,7 @@ abstract class SQModelHelper_Convert extends SQLoggableObject {
      */
     @Nullable
     protected static String convert(@Nullable final Date date) {
-        final String methodName = "String convert(date)";
-        try {
-            return new SimpleDateFormat(K_FORMAT_DATE).format(date);
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return null;
+        return SQConvertHelper.convert(date);
     }
 
     /**
@@ -94,12 +65,6 @@ abstract class SQModelHelper_Convert extends SQLoggableObject {
      */
     @Nullable
     protected static Date convert(@Nullable final String date) {
-        final String methodName = "String convert(date)";
-        try {
-            return new SimpleDateFormat(K_FORMAT_DATE).parse(date);
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return null;
+        return SQConvertHelper.convert(date);
     }
 }

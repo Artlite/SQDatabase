@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                             public SQClass convert(@NonNull Cursor cursor) {
                                 return new SQClass(cursor);
                             }
-                        }, filter));
+                        }));
                 classes.size();
             }
         });
