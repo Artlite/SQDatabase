@@ -169,12 +169,12 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> selectAll(@Nullable final Class ownerClass,
-                                                           @Nullable final SQCursorCallback<T> callback,
-                                                           @Nullable final SQFilter<K>... filters) {
+    public static <T extends SQModel, K> List<T> select(@Nullable final Class ownerClass,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            result.addAll(selectAll(ownerClass, ownerClass.getSimpleName(), callback, filters));
+            result.addAll(select(ownerClass, ownerClass.getSimpleName(), callback, filters));
         }
         return result;
     }
@@ -186,11 +186,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> selectAll(@Nullable final Class ownerClass,
-                                                           @Nullable final String tableName,
-                                                           @Nullable final SQCursorCallback<T> callback,
-                                                           @Nullable final SQFilter<K>... filters) {
-        final String methodName = "List<Cursor> selectAll(tableName, ownerClass)";
+    public static <T extends SQModel, K> List<T> select(@Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
+        final String methodName = "List<Cursor> select(tableName, ownerClass)";
         List<T> result = new ArrayList<>();
         try {
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
