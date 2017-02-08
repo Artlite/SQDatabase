@@ -146,25 +146,6 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     /**
-     * Method which provide the update of the {@link SQModel} objects list
-     *
-     * @param objects list of {@link SQModel}
-     * @param <T>     objects type
-     * @return update result
-     */
-    public static synchronized <T extends SQModel> boolean update(@Nullable final T... objects) {
-        boolean result = true;
-        if (validate(objects)) {
-            for (final T object : objects) {
-                if (!update(object)) {
-                    result = false;
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
      * Method which provide the select all functional
      *
      * @param ownerClass owner class
@@ -173,16 +154,7 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel, K> List<T> delete(@Nullable final Class ownerClass,
                                                         @Nullable final SQCursorCallback<T> callback,
                                                         @Nullable final SQFilter<K>... filters) {
-        final List<T> result = new ArrayList<>();
-        if (ownerClass != null) {
-            final List<T> selected = select(ownerClass, callback, filters);
-            for (final T object : selected) {
-                if (delete(object)) {
-                    result.add(object);
-                }
-            }
-        }
-        return result;
+        return delete(ownerClass, ownerClass.getSimpleName(), callback, filters);
     }
 
     /**
@@ -196,12 +168,37 @@ public final class SQDatabase extends SQLoggableObject {
                                                         @Nullable final String tableName,
                                                         @Nullable final SQCursorCallback<T> callback,
                                                         @Nullable final SQFilter<K>... filters) {
+        final String methodName = "List<Cursor> delete(ownerClass, tableName, callback, filters)";
         final List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            final List<T> selected = select(ownerClass, tableName, callback, filters);
-            for (final T object : selected) {
-                if (delete(object)) {
-                    result.add(object);
+            //Get objects
+            result.addAll(select(ownerClass, tableName, callback, filters));
+            //Delete objects
+            try {
+                final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+                final String filter = getFilter(filters);
+                final String[] args = getFilterArgs(filters);
+                database.delete(tableName, filter, args);
+            } catch (Exception ex) {
+                log(null, methodName, ex, null);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Method which provide the update of the {@link SQModel} objects list
+     *
+     * @param objects list of {@link SQModel}
+     * @param <T>     objects type
+     * @return update result
+     */
+    public static synchronized <T extends SQModel> boolean update(@Nullable final T... objects) {
+        boolean result = true;
+        if (validate(objects)) {
+            for (final T object : objects) {
+                if (!update(object)) {
+                    result = false;
                 }
             }
         }

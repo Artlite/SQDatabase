@@ -23,7 +23,7 @@ final class SQDatabaseOpenHelper extends SQLiteOpenHelper {
      * Constants
      */
     protected static final int K_DATABASE_VERSION = 1;
-    protected static final String K_DATABASE_NAME = "SQLiteBase.db";
+    protected static final String K_DATABASE_NAME = "SQLiteArtliteBase.db";
     protected static final Exception K_ERROR_CREATE =
             new Exception("SQDatabase should be crated in android Application instance");
     /**

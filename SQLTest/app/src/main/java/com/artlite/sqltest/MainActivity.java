@@ -76,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
                         return new SQClass(cursor);
                     }
                 }, filter);
+                SQLogHelper.log(MainActivity.this,
+                        "deleteObjects",
+                        null,
+                        deleted);
             }
         });
     }
