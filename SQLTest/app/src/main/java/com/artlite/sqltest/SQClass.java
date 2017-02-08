@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.annotations.SQField;
+import com.artlite.sqlib.helpers.generate.SQGenerateHelper;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.model.SQModel;
@@ -56,5 +57,10 @@ public class SQClass implements SQModel {
         isSpecial = SQModelHelper.getBoolean(cursor, "isSpecial");
         floatCount = SQModelHelper.getFloat(cursor, "floatCount");
         currentDate = SQModelHelper.getDate(cursor, "currentDate");
+    }
+
+    @Override
+    public String toString() {
+        return SQGenerateHelper.generateDescription(this);
     }
 }

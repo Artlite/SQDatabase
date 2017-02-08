@@ -17,26 +17,25 @@ public final class SQLogHelper {
      * @param methodName method name
      * @param error      error
      * @param object     object for show
-     * @param <T>
      */
-    public static <T extends SQLoggableObject> void log(@Nullable final T owner,
-                                                           @Nullable final String methodName,
-                                                           @Nullable final Exception error,
-                                                           @Nullable final Object object) {
+    public static void log(@Nullable final Object owner,
+                           @Nullable final String methodName,
+                           @Nullable final Exception error,
+                           @Nullable final Object object) {
         final StringBuilder builder = new StringBuilder();
         String TAG = SQLoggableObject.class.getSimpleName();
         if (validate(owner)) {
             TAG = owner.getClass().getSimpleName();
-            builder.append("Class:\t").append(TAG);
+            builder.append("Class: \t").append(TAG);
         }
         if (validate(methodName)) {
-            builder.append("Method:\t").append(methodName);
+            builder.append("\nMethod:\t").append(methodName);
         }
         if (validate(error)) {
-            builder.append("Error:\t").append(error.toString());
+            builder.append("\nError: \t").append(error.toString());
         }
         if (validate(object)) {
-            builder.append("Object:\t").append(object.toString());
+            builder.append("\nObject:\t").append(object.toString());
         }
         if (error == null) {
             Log.e(TAG, builder.toString());
