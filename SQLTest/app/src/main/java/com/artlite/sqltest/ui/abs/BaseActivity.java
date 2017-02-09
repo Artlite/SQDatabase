@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
+
+import com.artlite.sqltest.R;
 
 /**
  * Created by dlernatovich on 2/8/2017.
@@ -185,16 +189,75 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     /**
      * Method which provide the doing action on UI thread after the delaying time
      *
+     * @param actionPerformer current action
+     */
+    protected void runBackground(final OnActionPerformer actionPerformer) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                actionPerformer.onActionPerform();
+            }
+        }).start();
+    }
+
+    /**
+     * Method which provide the doing action on UI thread after the delaying time
+     *
+     * @param actionPerformer current action
+     */
+    protected void runMain(final OnActionPerformer actionPerformer) {
+        runMain(0, actionPerformer);
+    }
+
+    /**
+     * Method which provide the doing action on UI thread after the delaying time
+     *
      * @param delayTime       delaying time (in seconds)
      * @param actionPerformer current action
      */
-    protected void runOnMainThread(double delayTime, final OnActionPerformer actionPerformer) {
+    protected void runMain(double delayTime, final OnActionPerformer actionPerformer) {
         MAIN_THREAD_HANDLER.postDelayed(new Runnable() {
             @Override
             public void run() {
                 actionPerformer.onActionPerform();
             }
         }, (int) (delayTime * 1000));
+    }
+
+    /**
+     * Method which provide the validate of {@link EditText}
+     *
+     * @param editTexts list of {@link EditText}
+     * @return checking value
+     */
+    protected boolean validateFields(@Nullable final EditText... editTexts) {
+        if (editTexts != null) {
+            for (final EditText editText : editTexts) {
+                if (editText != null) {
+                    final String value = editText.getText().toString().trim();
+                    if ((value == null) || (value.isEmpty())) {
+                        setErrorToEditText(editText,
+                                getResources().getString(R.string.text_required_field));
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method which provide the set error to EditText
+     *
+     * @param view      current EditText
+     * @param errorText error text
+     */
+    protected void setErrorToEditText(@Nullable final EditText view,
+                                      @Nullable final String errorText) {
+        if ((view != null)) {
+            view.setError(errorText);
+            view.requestFocus();
+        }
     }
 
     //==========================ABSTRACT METHODS==============================

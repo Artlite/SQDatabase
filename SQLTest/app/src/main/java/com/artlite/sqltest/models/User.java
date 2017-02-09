@@ -12,6 +12,7 @@ import com.artlite.adapteredrecyclerview.events.RecycleEvent;
 import com.artlite.adapteredrecyclerview.models.BaseObject;
 import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.annotations.SQField;
+import com.artlite.sqlib.helpers.generate.SQGenerateHelper;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.model.SQModel;
 import com.artlite.sqltest.R;
@@ -50,6 +51,15 @@ public class User extends BaseObject implements SQModel {
         this.name = name;
         this.surname = surname;
         this.aboutMe = aboutMe;
+    }
+
+    /**
+     * Method which provide the creating {@link User} from {@link Cursor}
+     *
+     * @param cursor instance of {@link Cursor}
+     */
+    public User(@NonNull final Cursor cursor) {
+        apply(cursor);
     }
 
     /**
@@ -182,6 +192,11 @@ public class User extends BaseObject implements SQModel {
     @Override
     public BaseRecyclerItem getRecyclerItem(@NonNull Context context) {
         return new ObjectView(context);
+    }
+
+    @Override
+    public String toString() {
+        return SQGenerateHelper.generateDescription(this);
     }
 
     //==============================================================================================

@@ -3,4 +3,5 @@
     <string name="text_delete">Delete</string>
     <string name="text_users">Users</string>
     <string name="text_create_user">Crete user</string>
+    <string name="text_required_field">Required field</string>
 </resources>
