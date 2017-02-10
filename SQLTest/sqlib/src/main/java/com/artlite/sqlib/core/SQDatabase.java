@@ -8,13 +8,21 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.annotations.SQField;
+import com.artlite.sqlib.callbacks.SQAnnotationClassCallback;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.constants.SQDatabaseType;
+import com.artlite.sqlib.constants.SQFilterDelimiter;
+import com.artlite.sqlib.constants.SQType;
+import com.artlite.sqlib.helpers.annotation.SQAnnotationHelper;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
+import com.artlite.sqlib.helpers.validation.SQValidationHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqlib.model.SQModel;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +66,10 @@ public final class SQDatabase extends SQLoggableObject {
         }
     }
 
+    //==============================================================================================
+    //                                      INSERT
+    //==============================================================================================
+
     /**
      * Method which provide the
      *
@@ -99,6 +111,10 @@ public final class SQDatabase extends SQLoggableObject {
         }
         return false;
     }
+
+    //==============================================================================================
+    //                                      DELETE
+    //==============================================================================================
 
     /**
      * Method which provide the delete objects
@@ -145,7 +161,7 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     /**
-     * Method which provide the select all functional
+     * Method which provide the deleting functional
      *
      * @param ownerClass owner class
      * @return list of {@link Cursor}
@@ -157,7 +173,7 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     /**
-     * Method which provide the select all functional
+     * Method which provide the deleting functional
      *
      * @param tableName  table name
      * @param ownerClass owner class
@@ -184,6 +200,10 @@ public final class SQDatabase extends SQLoggableObject {
         }
         return result;
     }
+
+    //==============================================================================================
+    //                                      UPDATE
+    //==============================================================================================
 
     /**
      * Method which provide the update of the {@link SQModel} objects list
@@ -247,6 +267,10 @@ public final class SQDatabase extends SQLoggableObject {
         return true;
     }
 
+    //==============================================================================================
+    //                                      SELECT
+    //==============================================================================================
+
     /**
      * Method which provide the select all functional
      *
@@ -274,13 +298,29 @@ public final class SQDatabase extends SQLoggableObject {
                                                         @Nullable final String tableName,
                                                         @Nullable final SQCursorCallback<T> callback,
                                                         @Nullable final SQFilter<K>... filters) {
+        return select(false, ownerClass, tableName, callback, filters);
+    }
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param isSearch   if it search
+     * @param tableName  table name
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    protected static <T extends SQModel, K> List<T> select(boolean isSearch,
+                                                           @Nullable final Class ownerClass,
+                                                           @Nullable final String tableName,
+                                                           @Nullable final SQCursorCallback<T> callback,
+                                                           @Nullable final SQFilter<K>... filters) {
         final String methodName = "List<Cursor> select(tableName, ownerClass)";
         List<T> result = new ArrayList<>();
         try {
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final String[] projection = SQModelHelper.generateProjection(getContext(), ownerClass);
             final String filter = getFilter(filters);
-            final String[] args = getFilterArgs(filters);
+            final String[] args = getFilterArgs(isSearch, filters);
             final Cursor cursor = database.query(tableName, projection,
                     filter, args, null, null, null);
             cursor.moveToFirst();
@@ -298,6 +338,71 @@ public final class SQDatabase extends SQLoggableObject {
             log(null, methodName, ex, null);
         }
         return result;
+    }
+
+    //==============================================================================================
+    //                                      SEARCH
+    //==============================================================================================
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass owner class
+     * @param query      search query
+     * @param callback   instance of {@link SQCursorCallback}
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final String query,
+                                                        @Nullable final SQCursorCallback<T> callback) {
+        final List<SQFilter<String>> filters = new ArrayList<>();
+        if (SQValidationHelper.emptyValidate(ownerClass, query)) {
+            SQAnnotationHelper.annotate(ownerClass, new SQAnnotationClassCallback() {
+                @Override
+                public void onFoundAnnotation(@NonNull Annotation annotation,
+                                              @NonNull Field field)
+                        throws IllegalAccessException {
+                    final SQType type = SQType.getType(field);
+                    if ((type != null) &&
+                            ((type == SQType.STRING) || ((type == SQType.VARCHAR)))) {
+                        filters.add(new SQFilter<String>(field.getName(), query,
+                                SQFilterDelimiter.OR));
+                    }
+                }
+            }, SQField.class);
+        }
+        return search(ownerClass, callback, filters.toArray(new SQFilter[0]));
+
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
+        List<T> result = new ArrayList<>();
+        if (ownerClass != null) {
+            result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
+        }
+        return result;
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param tableName  table name
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
+        return select(true, ownerClass, tableName, callback, filters);
     }
 
     /**
@@ -337,11 +442,25 @@ public final class SQDatabase extends SQLoggableObject {
      */
     @NonNull
     protected static <T> String[] getFilterArgs(@Nullable final SQFilter<T>... filters) {
+        return getFilterArgs(false, filters);
+    }
+
+    /**
+     * Method which provide the getting of the filter query
+     *
+     * @param isSearch if it search
+     * @param filters  filter objects
+     * @param <T>      objects type
+     * @return filter query
+     */
+    @NonNull
+    protected static <T> String[] getFilterArgs(boolean isSearch, @Nullable final SQFilter<T>... filters) {
         List<String> queryList = new ArrayList<>();
         if (validate(filters)) {
             for (final SQFilter filter : filters) {
                 if (validate(filter)) {
-                    final String filterValue = filter.getFilterArgs();
+                    final String filterValue = (isSearch == true)
+                            ? filter.getSearchFilterArgs() : filter.getFilterArgs();
                     if (validate(filterValue)) {
                         queryList.add(filterValue);
                     }

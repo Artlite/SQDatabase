@@ -73,6 +73,20 @@ public class SQFilter<K extends Object> {
      * @return filter query
      */
     @Nullable
+    public final String getSearchFilterArgs() {
+        final String args = getFilterArgs().trim();
+        if ((args != null) && (!args.isEmpty())) {
+            return String.format("%%%s%%", args);
+        }
+        return null;
+    }
+
+    /**
+     * Method which provide the getting of the filter query args
+     *
+     * @return filter query
+     */
+    @Nullable
     public final String getFilterArgs() {
         if (value.getClass().getSimpleName().equalsIgnoreCase("boolean")) {
             return (((Boolean) value) == true) ? "1" : "0";

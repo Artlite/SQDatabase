@@ -5,6 +5,7 @@ import android.view.MenuItem;
 
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqltest.R;
+import com.artlite.sqltest.helpers.RandomHelper;
 import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
@@ -46,6 +47,10 @@ public class CreateUserActivity extends BaseActivity {
             editName.setText(user.getName());
             editSurname.setText(user.getSurname());
             editAbout.setText(user.getAboutMe());
+        } else {
+            editName.setText(RandomHelper.generateRandomString(10));
+            editSurname.setText(RandomHelper.generateRandomString(6));
+            editAbout.setText(RandomHelper.generateRandomString(200));
         }
     }
 
