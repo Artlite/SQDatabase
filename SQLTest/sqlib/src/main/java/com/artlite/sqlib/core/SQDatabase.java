@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.constants.SQDatabaseType;
@@ -311,19 +310,20 @@ public final class SQDatabase extends SQLoggableObject {
     @NonNull
     protected static <T> String getFilter(@Nullable final SQFilter<T>... filters) {
         final StringBuilder result = new StringBuilder();
-        List<String> queryList = new ArrayList<>();
         if (validate(filters)) {
-            for (final SQFilter filter : filters) {
+            for (int i = 0; i < filters.length; i++) {
+                final SQFilter filter = filters[i];
                 if (validate(filter)) {
                     final String filterValue = filter.getFilter();
-                    if (validate(filterValue)) {
-                        queryList.add(filterValue);
+                    final String delimiter = filter.getDelimiter();
+                    if (validate(filterValue, delimiter)) {
+                        if (i > 0) {
+                            result.append(delimiter);
+                        }
+                        result.append(filterValue);
                     }
                 }
             }
-        }
-        if (queryList.size() > 0) {
-            result.append(TextUtils.join(", ", queryList));
         }
         return result.toString();
     }

@@ -1,8 +1,9 @@
 package com.artlite.sqlib.model;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.artlite.sqlib.constants.SQType;
+import com.artlite.sqlib.constants.SQFilterDelimiter;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
 
 /**
@@ -16,6 +17,7 @@ public class SQFilter<K extends Object> {
      */
     private final String fieldName;
     private final K value;
+    private final SQFilterDelimiter delimiter;
 
     /**
      * Constructor which provide the creating of the filter
@@ -25,8 +27,21 @@ public class SQFilter<K extends Object> {
      */
     public SQFilter(@Nullable final String fieldName,
                     @Nullable final K value) {
+        this(fieldName, value, SQFilterDelimiter.AND);
+    }
+
+    /**
+     * Constructor which provide the creating of the filter
+     *
+     * @param fieldName field name
+     * @param value     search value
+     */
+    public SQFilter(@Nullable final String fieldName,
+                    @Nullable final K value,
+                    @NonNull final SQFilterDelimiter delimiter) {
         this.fieldName = fieldName;
         this.value = value;
+        this.delimiter = delimiter;
     }
 
     /**
@@ -40,6 +55,16 @@ public class SQFilter<K extends Object> {
             return String.format("%s %s", fieldName, "LIKE ?");
         }
         return null;
+    }
+
+    /**
+     * Method which provide the getting of the filter delimiter
+     *
+     * @return filter delimiter value
+     */
+    @NonNull
+    public String getDelimiter() {
+        return delimiter.getValue();
     }
 
     /**
