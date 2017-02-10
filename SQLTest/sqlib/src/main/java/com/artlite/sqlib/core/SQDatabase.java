@@ -268,6 +268,89 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     //==============================================================================================
+    //                                      SEARCH
+    //==============================================================================================
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass owner class
+     * @param query      search query
+     * @param callback   instance of {@link SQCursorCallback}
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final String query,
+                                                        @Nullable final SQCursorCallback<T> callback) {
+        final List<T> result = new ArrayList<>();
+        if (validate(ownerClass)) {
+            result.addAll(search(ownerClass, ownerClass.getSimpleName(), query, callback));
+        }
+        return result;
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass owner class
+     * @param query      search query
+     * @param callback   instance of {@link SQCursorCallback}
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final String query,
+                                                        @Nullable final SQCursorCallback<T> callback) {
+        final List<SQFilter<String>> filters = new ArrayList<>();
+        if (SQValidationHelper.emptyValidate(ownerClass, query)) {
+            SQAnnotationHelper.annotate(ownerClass, new SQAnnotationClassCallback() {
+                @Override
+                public void onFoundAnnotation(@NonNull Annotation annotation,
+                                              @NonNull Field field)
+                        throws IllegalAccessException {
+                    final SQType type = SQType.getType(field);
+                    if ((type != null) &&
+                            ((type == SQType.STRING) || ((type == SQType.VARCHAR)))) {
+                        filters.add(new SQFilter<String>(field.getName(), query,
+                                SQFilterDelimiter.OR));
+                    }
+                }
+            }, SQField.class);
+        }
+        return search(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
+        List<T> result = new ArrayList<>();
+        if (ownerClass != null) {
+            result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
+        }
+        return result;
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param tableName  table name
+     * @param ownerClass owner class
+     * @return list of {@link Cursor}
+     */
+    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter<K>... filters) {
+        return select(true, ownerClass, tableName, callback, filters);
+    }
+
+    //==============================================================================================
     //                                      SELECT
     //==============================================================================================
 
@@ -338,71 +421,6 @@ public final class SQDatabase extends SQLoggableObject {
             log(null, methodName, ex, null);
         }
         return result;
-    }
-
-    //==============================================================================================
-    //                                      SEARCH
-    //==============================================================================================
-
-    /**
-     * Method which provide the searching functional
-     *
-     * @param ownerClass owner class
-     * @param query      search query
-     * @param callback   instance of {@link SQCursorCallback}
-     * @return list of {@link Cursor}
-     */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final String query,
-                                                        @Nullable final SQCursorCallback<T> callback) {
-        final List<SQFilter<String>> filters = new ArrayList<>();
-        if (SQValidationHelper.emptyValidate(ownerClass, query)) {
-            SQAnnotationHelper.annotate(ownerClass, new SQAnnotationClassCallback() {
-                @Override
-                public void onFoundAnnotation(@NonNull Annotation annotation,
-                                              @NonNull Field field)
-                        throws IllegalAccessException {
-                    final SQType type = SQType.getType(field);
-                    if ((type != null) &&
-                            ((type == SQType.STRING) || ((type == SQType.VARCHAR)))) {
-                        filters.add(new SQFilter<String>(field.getName(), query,
-                                SQFilterDelimiter.OR));
-                    }
-                }
-            }, SQField.class);
-        }
-        return search(ownerClass, callback, filters.toArray(new SQFilter[0]));
-
-    }
-
-    /**
-     * Method which provide the searching functional
-     *
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
-     */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
-        List<T> result = new ArrayList<>();
-        if (ownerClass != null) {
-            result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
-        }
-        return result;
-    }
-
-    /**
-     * Method which provide the searching functional
-     *
-     * @param tableName  table name
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
-     */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
-        return select(true, ownerClass, tableName, callback, filters);
     }
 
     /**

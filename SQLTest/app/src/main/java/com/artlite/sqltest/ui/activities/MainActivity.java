@@ -142,7 +142,7 @@ public class MainActivity extends BaseActivity {
         runBackground(new OnActionPerformer() {
             @Override
             public void onActionPerform() {
-                users.addAll(SQDatabase.search(User.class, new SQCursorCallback<User>() {
+                users.addAll(SQDatabase.select(User.class, new SQCursorCallback<User>() {
                     @Nullable
                     @Override
                     public User convert(@NonNull Cursor cursor) {
