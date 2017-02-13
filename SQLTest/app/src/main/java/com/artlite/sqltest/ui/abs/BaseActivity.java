@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.artlite.sqltest.R;
+import com.artlite.sqltest.managers.EventManager;
 
 /**
  * Created by dlernatovich on 2/8/2017.
@@ -32,11 +34,13 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
 
     protected static final int NONE_MENU = Integer.MIN_VALUE;
     protected final Handler MAIN_THREAD_HANDLER = new Handler();
+    private EventManager.OnEventCallback eventCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
+        onEventRegister();
         onCreateActivity();
     }
 
@@ -49,7 +53,6 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         getMenuInflater().inflate(menuId, menu);
         return true;
     }
-
 
     /**
      * Overriden method for the OnClickListener
@@ -258,6 +261,34 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
             view.setError(errorText);
             view.requestFocus();
         }
+    }
+
+    //==============================================================================================
+    //                                          EVENTS
+    //==============================================================================================
+
+    /**
+     * Method which provide the registering of the
+     * {@link com.artlite.sqltest.managers.EventManager.Event}
+     */
+    private void onEventRegister() {
+        eventCallback = new EventManager.OnEventCallback() {
+            @Override
+            public void onEvent(@NonNull EventManager.Event event) {
+                onEventReceived(event);
+            }
+        };
+        EventManager.register(this, eventCallback);
+    }
+
+    /**
+     * Method which provide the action when {@link com.artlite.sqltest.managers.EventManager.Event}
+     * received
+     *
+     * @param event instance of {@link com.artlite.sqltest.managers.EventManager.Event}
+     */
+    protected void onEventReceived(@NonNull final EventManager.Event event) {
+
     }
 
     //==========================ABSTRACT METHODS==============================

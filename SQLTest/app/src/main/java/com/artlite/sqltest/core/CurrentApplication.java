@@ -1,12 +1,14 @@
 package com.artlite.sqltest.core;
 
 import android.app.Application;
-import android.support.multidex.MultiDexApplication;
 
 import com.artlite.sqlib.core.SQDatabase;
+import com.artlite.sqltest.managers.EventManager;
+import com.artlite.sqltest.managers.ThreadManager;
 
 /**
- * Created by dlernatovich on 12/22/2016.
+ * Application singleton
+ * Created by dlernatovich
  */
 
 public final class CurrentApplication extends Application {
@@ -18,5 +20,7 @@ public final class CurrentApplication extends Application {
     public void onCreate() {
         super.onCreate();
         SQDatabase.init(this);
+        EventManager.init(this);
+        ThreadManager.init(this);
     }
 }

@@ -14,6 +14,9 @@ import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqltest.R;
+import com.artlite.sqltest.constants.EventCodes;
+import com.artlite.sqltest.managers.EventManager;
+import com.artlite.sqltest.managers.ThreadManager;
 import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
@@ -21,6 +24,9 @@ import com.artlite.sqltest.ui.abs.BaseActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class which provide the created {@link User}
+ */
 public class MainActivity extends BaseActivity {
 
     private AdapteredView adapteredView;
@@ -67,20 +73,6 @@ public class MainActivity extends BaseActivity {
         setTitle(R.string.text_users);
         adapteredView = (AdapteredView) findViewById(R.id.recycler_view);
         customizeRecycler(adapteredView);
-    }
-
-    /**
-     * Dispatch onResume() to fragments.  Note that for better inter-operation
-     * with older versions of the platform, at the point of this call the
-     * fragments attached to the activity are <em>not</em> resumed.  This means
-     * that in some cases the previous state may still be saved, not allowing
-     * fragment transactions that modify the state.  To correctly interact
-     * with fragments in their proper state, you should instead override
-     * {@link #onResumeFragments()}.
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
         receiveUsers();
     }
 
@@ -139,9 +131,9 @@ public class MainActivity extends BaseActivity {
     protected final void receiveUsers() {
         final List<User> users = new ArrayList<>();
         adapteredView.showRefresh();
-        runBackground(new OnActionPerformer() {
+        ThreadManager.execute(new ThreadManager.OnExecutionCallback() {
             @Override
-            public void onActionPerform() {
+            public void onBackground() {
                 users.addAll(SQDatabase.select(User.class, new SQCursorCallback<User>() {
                     @Nullable
                     @Override
@@ -149,17 +141,28 @@ public class MainActivity extends BaseActivity {
                         return new User(cursor);
                     }
                 }));
-                runMain(new OnActionPerformer() {
-                    @Override
-                    public void onActionPerform() {
-                        if (adapteredView != null) {
-                            adapteredView.set(users);
-                            adapteredView.hideRefresh();
-                        }
-                    }
-                });
+            }
+
+            @Override
+            public void onMain() {
+                if (adapteredView != null) {
+                    adapteredView.set(users);
+                    adapteredView.hideRefresh();
+                }
             }
         });
     }
 
+    /**
+     * Method which provide the action when {@link com.artlite.sqltest.managers.EventManager.Event}
+     * received
+     *
+     * @param event instance of {@link com.artlite.sqltest.managers.EventManager.Event}
+     */
+    @Override
+    protected void onEventReceived(@NonNull EventManager.Event event) {
+        if (event.getCode() == EventCodes.K_CREATE_USER) {
+            receiveUsers();
+        }
+    }
 }

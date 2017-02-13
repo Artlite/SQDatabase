@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 
 /**
  * Class which provide the annotation performing
- * Created by dlernatovich on 12/14/2016.
+ * Created by dlernatovich
  */
 
 public final class SQAnnotationHelper extends SQBaseHelper {

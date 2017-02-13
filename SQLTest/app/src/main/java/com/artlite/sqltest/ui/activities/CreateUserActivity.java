@@ -5,11 +5,16 @@ import android.view.MenuItem;
 
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqltest.R;
+import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.helpers.RandomHelper;
+import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
+/**
+ * Class which provide the {@link User} creating
+ */
 public class CreateUserActivity extends BaseActivity {
 
     private AppCompatEditText editName;
@@ -111,6 +116,7 @@ public class CreateUserActivity extends BaseActivity {
                 user.setAboutMe(editAbout.getText().toString());
                 SQDatabase.update(user);
             }
+            EventManager.send(MainActivity.class, EventCodes.K_CREATE_USER);
             onBackPressed();
         }
     }
