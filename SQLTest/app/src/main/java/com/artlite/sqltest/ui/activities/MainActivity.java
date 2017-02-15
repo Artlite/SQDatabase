@@ -18,7 +18,7 @@ import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.ThreadManager;
 import com.artlite.sqltest.managers.TransferManager;
-import com.artlite.sqltest.models.User;
+import com.artlite.sqltest.models.user.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
 import java.util.ArrayList;
@@ -109,8 +109,9 @@ public class MainActivity extends BaseActivity {
                                      int index,
                                      @NonNull final User user) {
             if (recycleEvent.equals(User.K_DELETE_USER)) {
-                SQDatabase.delete(user);
-                adapteredView.delete(user);
+                onRecycleDelete(user);
+            } else if (recycleEvent.equals(User.K_ADD_TO_FAVORITE)) {
+                onRecycleFavorite(user);
             }
         }
     };
@@ -154,15 +155,43 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * Method which provide the action when {@link com.artlite.sqltest.managers.EventManager.Event}
-     * received
+     * Method which provide the event performing
      *
-     * @param event instance of {@link com.artlite.sqltest.managers.EventManager.Event}
+     * @param event instance of {@link EventManager.Event}
      */
     @Override
-    protected void onEventReceived(@NonNull EventManager.Event event) {
+    public void onEvent(@NonNull EventManager.Event event) {
+        super.onEvent(event);
         if (event.getCode() == EventCodes.K_CREATE_USER) {
             receiveUsers();
         }
     }
+
+    //==============================================================================================
+    //                                      RECYCLE EVENTS
+    //==============================================================================================
+
+    /**
+     * Method which provide the deleting user
+     *
+     * @param user instance of {@link User}
+     */
+    private void onRecycleDelete(@NonNull final User user) {
+        adapteredView.delete(user);
+        SQDatabase.delete(user);
+    }
+
+    /**
+     * Method which provide the add user to favorite
+     *
+     * @param user instance of {@link User}
+     */
+    private void onRecycleFavorite(@NonNull final User user) {
+        user.switchFavorite();
+        SQDatabase.update(user);
+        adapteredView.update(user);
+        adapteredView.sort();
+    }
+
+
 }

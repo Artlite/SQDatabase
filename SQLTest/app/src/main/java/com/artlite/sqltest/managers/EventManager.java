@@ -5,14 +5,13 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.LruCache;
 
 import com.artlite.sqlib.log.SQLogHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class which provide the Event listening
@@ -21,9 +20,11 @@ import java.util.Map;
 
 public final class EventManager {
     private static final String TAG = EventManager.class.getName();
+    private static final int K_CACHE_SIZE = 5 * 1024 * 1024; // 4MiB
 
     private static EventManager instance;
-    private Map<String, List<WeakReference<OnEventCallback>>> events;
+
+    private final LruCache<String, List<WeakReference<OnEventCallback>>> events;
     private WeakReference<Context> context;
     private Handler handler;
 
@@ -59,7 +60,7 @@ public final class EventManager {
      * Default constructor
      */
     private EventManager(@Nullable final Context context) {
-        this.events = new HashMap<>();
+        this.events = new LruCache<>(K_CACHE_SIZE);
         this.context = new WeakReference<Context>(context);
         this.handler = new Handler();
     }
@@ -108,12 +109,12 @@ public final class EventManager {
             return false;
         }
         //Register Event
-        synchronized (getInstance().events) {
+        synchronized (instance.events) {
             if ((event != null) && (callback != null)) {
-                if (!getInstance().events.containsKey(event)) {
-                    getInstance().events.put(event, new ArrayList<WeakReference<OnEventCallback>>());
+                if (instance.events.get(event) == null) {
+                    instance.events.put(event, new ArrayList<WeakReference<OnEventCallback>>());
                 }
-                final List<WeakReference<OnEventCallback>> callbacks = getInstance().events.get(event);
+                final List<WeakReference<OnEventCallback>> callbacks = instance.events.get(event);
                 if (callbacks != null) {
                     callbacks.add(new WeakReference<OnEventCallback>(callback));
                 }
@@ -211,9 +212,9 @@ public final class EventManager {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (getInstance().events) {
-                        if (getInstance().events.containsKey(event)) {
-                            final List<WeakReference<OnEventCallback>> references = getInstance()
+                    synchronized (instance.events) {
+                        if (instance.events.get(event) != null) {
+                            final List<WeakReference<OnEventCallback>> references = instance
                                     .events.get(event);
                             final List<WeakReference<OnEventCallback>> missing = new ArrayList<>();
                             for (final WeakReference<OnEventCallback> reference : references) {
@@ -251,7 +252,7 @@ public final class EventManager {
     private static boolean execute(@Nullable final WeakReference<OnEventCallback> reference,
                                    @Nullable final Event event) {
         if ((reference != null) && (reference.get() != null) && (event != null)) {
-            getInstance().handler.post(new Runnable() {
+            instance.handler.post(new Runnable() {
                 @Override
                 public void run() {
                     reference.get().onEvent(event);
@@ -359,6 +360,19 @@ public final class EventManager {
         @Override
         public int hashCode() {
             return code;
+        }
+
+        /**
+         * Method which provide the generating to {@link String} value
+         *
+         * @return object {@link String} value
+         */
+        @Override
+        public String toString() {
+            return "Event{" +
+                    "code=" + code +
+                    ", object=" + object +
+                    '}';
         }
     }
 

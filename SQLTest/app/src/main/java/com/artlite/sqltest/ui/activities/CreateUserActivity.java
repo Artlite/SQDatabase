@@ -9,7 +9,7 @@ import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.helpers.RandomHelper;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.TransferManager;
-import com.artlite.sqltest.models.User;
+import com.artlite.sqltest.models.user.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
 /**

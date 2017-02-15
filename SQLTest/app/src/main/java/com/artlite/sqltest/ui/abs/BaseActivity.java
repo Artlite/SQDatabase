@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
+import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.managers.EventManager;
 
@@ -21,7 +22,8 @@ import com.artlite.sqltest.managers.EventManager;
  * Created by dlernatovich on 2/8/2017.
  */
 
-public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
+public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener,
+        EventManager.OnEventCallback {
     protected static final int ON_BASE_ACTIVITY_RESULTS = 0x1;
     protected static final String ON_RESULT_EXTRA_KEY = "ON_RESULT_EXTRA_KEY";
 
@@ -34,13 +36,12 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
 
     protected static final int NONE_MENU = Integer.MIN_VALUE;
     protected final Handler MAIN_THREAD_HANDLER = new Handler();
-    private EventManager.OnEventCallback eventCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        onEventRegister();
+        EventManager.register(this, this);
         onCreateActivity();
     }
 
@@ -268,27 +269,13 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     //==============================================================================================
 
     /**
-     * Method which provide the registering of the
-     * {@link com.artlite.sqltest.managers.EventManager.Event}
-     */
-    private void onEventRegister() {
-        eventCallback = new EventManager.OnEventCallback() {
-            @Override
-            public void onEvent(@NonNull EventManager.Event event) {
-                onEventReceived(event);
-            }
-        };
-        EventManager.register(this, eventCallback);
-    }
-
-    /**
-     * Method which provide the action when {@link com.artlite.sqltest.managers.EventManager.Event}
-     * received
+     * Method which provide the event performing
      *
-     * @param event instance of {@link com.artlite.sqltest.managers.EventManager.Event}
+     * @param event instance of {@link EventManager.Event}
      */
-    protected void onEventReceived(@NonNull final EventManager.Event event) {
-
+    @Override
+    public void onEvent(@NonNull final EventManager.Event event) {
+        SQLogHelper.log(this, "public void onEvent(event)", null, event);
     }
 
     //==========================ABSTRACT METHODS==============================
