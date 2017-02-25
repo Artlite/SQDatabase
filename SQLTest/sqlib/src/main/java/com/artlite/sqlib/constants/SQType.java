@@ -1,5 +1,6 @@
 package com.artlite.sqlib.constants;
 
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -75,7 +76,7 @@ public enum SQType {
                 return INTEGER;
             } else if (type == Date.class) {
                 return DATE;
-            } else if (type == Object.class) {
+            } else {
                 return BLOB;
             }
         }

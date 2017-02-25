@@ -1,10 +1,12 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.annotation.SuppressLint;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.helpers.convert.SQConvertHelper;
+import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 
 import java.io.ByteArrayInputStream;
@@ -28,22 +30,21 @@ abstract class SQModelHelper_Convert extends SQLoggableObject {
      * @param object object
      * @return object bytes
      */
-    @SuppressLint("NewApi")
     @NonNull
-    protected static byte[] convert(@Nullable final Object object) {
-        return SQConvertHelper.convert(object);
+    protected static byte[] convert(@Nullable final Parcelable object) {
+        return SQParcelableHelper.convert(object);
     }
 
     /**
      * Method which provide the converting the bytes array to {@link Object}
      *
-     * @param bytes bytes
+     * @param bytes   bytes
+     * @param creator instance of {@link Parcelable.Creator}
      * @return object
      */
-    @SuppressLint("NewApi")
     @Nullable
-    protected static Object convert(@Nullable final byte[] bytes) {
-        return SQConvertHelper.convert(bytes);
+    protected static <T> T convert(@Nullable final byte[] bytes, Parcelable.Creator<T> creator) {
+        return SQParcelableHelper.convert(bytes, creator);
     }
 
     /**

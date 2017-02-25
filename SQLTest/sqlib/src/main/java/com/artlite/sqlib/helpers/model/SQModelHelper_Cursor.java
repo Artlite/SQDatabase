@@ -1,9 +1,12 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.database.Cursor;
+import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
 
 import java.util.Date;
 
@@ -146,6 +149,30 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
             log(null, methodName, ex, null);
         }
         return result;
+    }
+
+    /**
+     * Method which provide the getting {@link Parcelable} object from {@link Cursor}
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param creator   object {@link Parcelable.Creator}
+     * @param fieldName field name
+     * @param <T>       object type
+     * @return instance of getting object
+     */
+    @Nullable
+    public static <T extends Parcelable> T getObject(@Nullable final Cursor cursor,
+                                                     @Nullable final Parcelable.Creator<T> creator,
+                                                     @Nullable final String fieldName) {
+        final String methodName = "T getObject(cursor, creator)";
+        try {
+            byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
+            Object object = SQParcelableHelper.convert(bytes, creator);
+            return (T) object;
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return null;
     }
 
 }

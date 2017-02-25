@@ -153,13 +153,13 @@ public final class SQAnnotationHelper extends SQBaseHelper {
             } catch (Exception e) {
                 SQLogHelper.log(null, methodName, e, null);
             }
-            if ((object == null) && (field.getType() == type)) {
+            if (object == null) {
                 try {
                     object = field.get(owner);
                 } catch (Exception e) {
                     SQLogHelper.log(null, methodName, e, null);
                 }
-            } else if (object.getClass() != type) {
+            } else if ((object != null) && (object.getClass() != type)) {
                 object = null;
             }
         }

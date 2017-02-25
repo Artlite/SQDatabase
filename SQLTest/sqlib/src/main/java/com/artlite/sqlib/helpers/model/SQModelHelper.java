@@ -2,6 +2,7 @@ package com.artlite.sqlib.helpers.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -164,9 +165,9 @@ public final class SQModelHelper extends SQModelHelper_Cursor {
                         }
                         break;
                     case BLOB:
-                        final Object blobObject = SQAnnotationHelper.getFieldValue(owner, field, Object.class);
-                        if (blobObject != null) {
-                            final byte[] bytes = convert(blobObject);
+                        final Object blobObject = SQAnnotationHelper.getFieldValue(owner, field, Parcelable.class);
+                        if ((blobObject != null) && (blobObject instanceof Parcelable)) {
+                            final byte[] bytes = convert((Parcelable) blobObject);
                             contentValues.put(name, bytes);
                         }
                         break;
