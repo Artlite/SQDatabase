@@ -2,9 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <item
+        android:id="@+id/menu_item_add_image"
+        android:icon="@drawable/ic_pick_image"
+        android:title="@string/text_create_user"
+        app:showAsAction="always" />
     <item
         android:id="@+id/menu_item_save_user"
-        android:icon="@drawable/ic_done_white"
+        android:icon="@drawable/ic_done"
         android:title="@string/text_create_user"
         app:showAsAction="always" />
 </menu>

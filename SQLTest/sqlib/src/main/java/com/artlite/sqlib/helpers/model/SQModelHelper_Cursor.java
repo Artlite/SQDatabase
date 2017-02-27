@@ -1,6 +1,7 @@
 package com.artlite.sqlib.helpers.model;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
@@ -164,11 +165,32 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
     public static <T extends Parcelable> T getObject(@Nullable final Cursor cursor,
                                                      @Nullable final Parcelable.Creator<T> creator,
                                                      @Nullable final String fieldName) {
-        final String methodName = "T getObject(cursor, creator)";
+        final String methodName = "T getObject(cursor, creator, fieldName)";
         try {
             byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
             Object object = SQParcelableHelper.convert(bytes, creator);
             return (T) object;
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return null;
+    }
+
+    /**
+     * Method which provide the getting of the {@link Bitmap} from {@link Cursor}
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param fieldName field name
+     * @return instance of {@link Bitmap}
+     */
+    @Nullable
+    public static Bitmap getBitmap(@Nullable final Cursor cursor,
+                                   @Nullable final String fieldName) {
+        final String methodName = "Bitmap getBitmap(cursor, fieldName)";
+        try {
+            byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
+            Bitmap object = SQParcelableHelper.convertToBitmap(bytes);
+            return object;
         } catch (Exception ex) {
             log(null, methodName, ex, null);
         }

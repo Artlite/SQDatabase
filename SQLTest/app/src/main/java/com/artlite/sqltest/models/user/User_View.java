@@ -36,6 +36,7 @@ abstract class User_View extends BaseObject implements SQModel {
         private ImageView imageDelete;
         private View layoutImage;
         private ImageView imageLike;
+        private ImageView imageAvatar;
 
         /**
          * Default constructor
@@ -57,6 +58,7 @@ abstract class User_View extends BaseObject implements SQModel {
             labelAboutMe.setText(user.getAboutMe());
             imageLike.setVisibility((user.isFavorite() == true)
                     ? VISIBLE : GONE);
+            imageAvatar.setImageBitmap(user.getAvatar());
         }
 
         /**
@@ -89,6 +91,7 @@ abstract class User_View extends BaseObject implements SQModel {
             imageDelete = (ImageView) findViewById(R.id.image_delete);
             layoutImage = findViewById(R.id.layout_image);
             imageLike = (ImageView) findViewById(R.id.image_like);
+            imageAvatar = (ImageView) findViewById(R.id.image_avatar);
         }
 
         /**

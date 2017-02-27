@@ -15,7 +15,8 @@
         <FrameLayout
             android:id="@+id/layout_image"
             android:layout_width="@dimen/dimen_50"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/dimen_5">
 
             <ImageView
                 style="@style/styleCropImageCenter"
@@ -26,8 +27,15 @@
                 android:tint="@android:color/darker_gray" />
 
             <ImageView
-                style="@style/styleCropImageCenter"
+                android:id="@+id/image_avatar"
+                style="@style/styleCropTrueImageCenter"
+                android:layout_width="@dimen/dimen_50"
+                android:layout_height="@dimen/dimen_50"
+                android:layout_gravity="center" />
+
+            <ImageView
                 android:id="@+id/image_like"
+                style="@style/styleCropImageCenter"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical|right"

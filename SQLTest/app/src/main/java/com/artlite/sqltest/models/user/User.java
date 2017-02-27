@@ -10,6 +10,7 @@ import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.model.SQModel;
+import com.artlite.sqltest.models.address.Address;
 
 import java.util.Date;
 
@@ -31,7 +32,9 @@ public class User extends User_View {
     @SQField
     private boolean favorite = false;
     @SQField
-    private Bitmap bitmap;
+    private Bitmap avatar;
+    @SQField
+    private Address address;
 
     /**
      * Constructor which provide the create {@link User} from
@@ -43,11 +46,12 @@ public class User extends User_View {
     public User(@Nullable final String name,
                 @Nullable final String surname,
                 @Nullable final String aboutMe,
-                @Nullable final Bitmap bitmap) {
+                @Nullable final Bitmap avatar) {
         this.name = name;
         this.surname = surname;
         this.aboutMe = aboutMe;
-        this.bitmap = bitmap;
+        this.avatar = avatar;
+        this.address = new Address();
     }
 
     /**
@@ -92,6 +96,8 @@ public class User extends User_View {
         this.surname = SQModelHelper.getString(cursor, "surname");
         this.aboutMe = SQModelHelper.getString(cursor, "aboutMe");
         this.creation = SQModelHelper.getDate(cursor, "creation");
+        this.address = SQModelHelper.getObject(cursor, Address.CREATOR, "address");
+        this.avatar = SQModelHelper.getBitmap(cursor, "avatar");
         setFavorite(SQModelHelper.getBoolean(cursor, "favorite"));
     }
 
@@ -209,6 +215,24 @@ public class User extends User_View {
      */
     public void switchFavorite() {
         setFavorite(!favorite);
+    }
+
+    /**
+     * Method which provide the getting of the {@link User} avatar
+     *
+     * @return instance of {@link Bitmap}
+     */
+    public Bitmap getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * Method which provide the setting of the {@link User} avatar
+     *
+     * @param avatar instance of {@link Bitmap}
+     */
+    public void setAvatar(Bitmap avatar) {
+        this.avatar = avatar;
     }
 
     /**

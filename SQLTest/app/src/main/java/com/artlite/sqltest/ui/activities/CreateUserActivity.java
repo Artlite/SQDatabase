@@ -55,7 +55,6 @@ public class CreateUserActivity extends BaseActivity {
         editSurname = (AppCompatEditText) findViewById(R.id.edit_surname);
         editAbout = (AppCompatEditText) findViewById(R.id.edit_about);
         imageAvatar = (ImageView) findViewById(R.id.imageAvatar);
-        setOnClickListeners(imageAvatar);
         onInitUser();
     }
 
@@ -68,6 +67,8 @@ public class CreateUserActivity extends BaseActivity {
             editName.setText(user.getName());
             editSurname.setText(user.getSurname());
             editAbout.setText(user.getAboutMe());
+            avatar = user.getAvatar();
+            imageAvatar.setImageBitmap(avatar);
         } else {
             editName.setText(RandomHelper.generateRandomString(10));
             editSurname.setText(RandomHelper.generateRandomString(6));
@@ -84,20 +85,6 @@ public class CreateUserActivity extends BaseActivity {
     @Override
     protected int getMenuId() {
         return R.menu.menu_create_user;
-    }
-
-    /**
-     * Overriden method for the OnClickListener
-     *
-     * @param v current view
-     */
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imageAvatar:
-                pickAvatar();
-                break;
-        }
     }
 
     /**
@@ -123,6 +110,10 @@ public class CreateUserActivity extends BaseActivity {
                 createOrUpdate();
                 return true;
             }
+            case R.id.menu_item_add_image: {
+                pickAvatar();
+                return true;
+            }
             default:
                 break;
         }
@@ -145,6 +136,7 @@ public class CreateUserActivity extends BaseActivity {
                 user.setName(editName.getText().toString());
                 user.setSurname(editSurname.getText().toString());
                 user.setAboutMe(editAbout.getText().toString());
+                user.setAvatar(avatar);
                 SQDatabase.update(user);
             }
             EventManager.send(MainActivity.class, EventCodes.K_CREATE_USER);
