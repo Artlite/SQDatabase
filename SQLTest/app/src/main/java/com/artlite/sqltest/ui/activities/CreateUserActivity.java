@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.artlite.sqlib.core.SQDatabase;
+import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
@@ -70,9 +71,9 @@ public class CreateUserActivity extends BaseActivity {
             avatar = user.getAvatar();
             imageAvatar.setImageBitmap(avatar);
         } else {
-            editName.setText(RandomHelper.generateRandomString(10));
-            editSurname.setText(RandomHelper.generateRandomString(6));
-            editAbout.setText(RandomHelper.generateRandomString(200));
+            editName.setText(SQRandomHelper.generateSentence(this, 1));
+            editSurname.setText(SQRandomHelper.generateSentence(this, 1));
+            editAbout.setText(SQRandomHelper.generateSentence(this, 50));
         }
     }
 

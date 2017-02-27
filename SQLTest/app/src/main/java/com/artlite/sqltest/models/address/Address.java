@@ -13,9 +13,9 @@ public final class Address implements Parcelable {
 
     private static final String TAG = Address.class.getName();
 
-    private String name = SQRandomHelper.generate(10);
-    private String address = SQRandomHelper.generate(10);
-    private int priority = SQRandomHelper.generate();
+    private String name = SQRandomHelper.generateString(10);
+    private String address = SQRandomHelper.generateString(10);
+    private int priority = SQRandomHelper.generateInt();
 
     /**
      * Default constructor
