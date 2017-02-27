@@ -2,6 +2,7 @@ package com.artlite.sqltest.models.user;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -9,7 +10,6 @@ import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.model.SQModel;
-import com.artlite.sqltest.models.address.Address;
 
 import java.util.Date;
 
@@ -31,7 +31,7 @@ public class User extends User_View {
     @SQField
     private boolean favorite = false;
     @SQField
-    private Address address;
+    private Bitmap bitmap;
 
     /**
      * Constructor which provide the create {@link User} from
@@ -42,11 +42,12 @@ public class User extends User_View {
      */
     public User(@Nullable final String name,
                 @Nullable final String surname,
-                @Nullable final String aboutMe) {
+                @Nullable final String aboutMe,
+                @Nullable final Bitmap bitmap) {
         this.name = name;
         this.surname = surname;
         this.aboutMe = aboutMe;
-        this.address = new Address();
+        this.bitmap = bitmap;
     }
 
     /**
@@ -92,7 +93,6 @@ public class User extends User_View {
         this.aboutMe = SQModelHelper.getString(cursor, "aboutMe");
         this.creation = SQModelHelper.getDate(cursor, "creation");
         setFavorite(SQModelHelper.getBoolean(cursor, "favorite"));
-        this.address = SQModelHelper.getObject(cursor, Address.CREATOR, "address");
     }
 
     /**
@@ -236,7 +236,6 @@ public class User extends User_View {
                 ", aboutMe='" + aboutMe + '\'' +
                 ", creation=" + creation +
                 ", favorite=" + favorite +
-                ", address=" + address +
                 '}';
     }
 }

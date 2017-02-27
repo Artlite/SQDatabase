@@ -1,26 +1,40 @@
 package com.artlite.sqltest.ui.activities;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.artlite.sqlib.core.SQDatabase;
+import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
+import com.artlite.sqltest.helpers.IntentHelper;
 import com.artlite.sqltest.helpers.RandomHelper;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.user.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
+import java.io.InputStream;
+
 /**
  * Class which provide the {@link User} creating
  */
 public class CreateUserActivity extends BaseActivity {
 
+    private static final int K_SELECT_PHOTO = 100;
+
     private AppCompatEditText editName;
     private AppCompatEditText editSurname;
     private AppCompatEditText editAbout;
+    private ImageView imageAvatar;
     private User user;
+    private Bitmap avatar;
 
     /**
      * Method which provide the getting of the layout ID for the current Activity
@@ -40,6 +54,8 @@ public class CreateUserActivity extends BaseActivity {
         editName = (AppCompatEditText) findViewById(R.id.edit_name);
         editSurname = (AppCompatEditText) findViewById(R.id.edit_surname);
         editAbout = (AppCompatEditText) findViewById(R.id.edit_about);
+        imageAvatar = (ImageView) findViewById(R.id.imageAvatar);
+        setOnClickListeners(imageAvatar);
         onInitUser();
     }
 
@@ -68,6 +84,20 @@ public class CreateUserActivity extends BaseActivity {
     @Override
     protected int getMenuId() {
         return R.menu.menu_create_user;
+    }
+
+    /**
+     * Overriden method for the OnClickListener
+     *
+     * @param v current view
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imageAvatar:
+                pickAvatar();
+                break;
+        }
     }
 
     /**
@@ -108,7 +138,8 @@ public class CreateUserActivity extends BaseActivity {
             if (user == null) {
                 final User user = new User(editName.getText().toString(),
                         editSurname.getText().toString(),
-                        editAbout.getText().toString());
+                        editAbout.getText().toString(),
+                        avatar);
                 SQDatabase.insert(user);
             } else {
                 user.setName(editName.getText().toString());
@@ -118,6 +149,37 @@ public class CreateUserActivity extends BaseActivity {
             }
             EventManager.send(MainActivity.class, EventCodes.K_CREATE_USER);
             onBackPressed();
+        }
+    }
+
+    //==============================================================================================
+    //                                      PICK IMAGE
+    //==============================================================================================
+
+    /**
+     * Method which provide the picking of the avatar
+     */
+    private void pickAvatar() {
+        startActivityForResult(IntentHelper.pickImage(), K_SELECT_PHOTO);
+    }
+
+    /**
+     * Method which provide the action when activity return result
+     *
+     * @param data current intent
+     */
+    @Override
+    protected void onActivityResult(int requestCode, Intent data) {
+        final String methodName = "void onActivityResult(requestCode, data)";
+        if (requestCode == K_SELECT_PHOTO) {
+            try {
+                Uri selectedImage = data.getData();
+                InputStream imageStream = getContentResolver().openInputStream(selectedImage);
+                avatar = BitmapFactory.decodeStream(imageStream);
+                imageAvatar.setImageBitmap(avatar);
+            } catch (Exception ex) {
+                SQLogHelper.log(this, methodName, ex, null);
+            }
         }
     }
 }
