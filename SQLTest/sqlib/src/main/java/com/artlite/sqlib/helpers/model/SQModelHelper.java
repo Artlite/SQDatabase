@@ -11,9 +11,9 @@ import android.text.TextUtils;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.callbacks.SQAnnotationCallback;
 import com.artlite.sqlib.constants.SQType;
+import com.artlite.sqlib.helpers.annotation.SQAnnotationHelper;
 import com.artlite.sqlib.helpers.preference.SQPreferenceHelper;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
-import com.artlite.sqlib.helpers.annotation.SQAnnotationHelper;
 import com.artlite.sqlib.model.SQModel;
 
 import java.lang.annotation.Annotation;
@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Class which provide the helper functional for {@link com.artlite.sqlib.model.SQModel}
+ * Class which provide the helper functional for {@link SQModel}
  * Created by dlernatovich on 12/22/2016.
  */
 

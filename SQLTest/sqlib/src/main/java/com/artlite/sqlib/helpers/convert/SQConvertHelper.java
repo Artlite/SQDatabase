@@ -12,6 +12,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,7 +36,7 @@ public final class SQConvertHelper extends SQBaseHelper {
      */
     @SuppressLint("NewApi")
     @NonNull
-    public static byte[] convert(@Nullable final Object object) {
+    public static <T extends Serializable> byte[] convert(@Nullable final T object) {
         final String methodName = "byte[] convert(object)";
         try {
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -57,12 +58,13 @@ public final class SQConvertHelper extends SQBaseHelper {
      */
     @SuppressLint("NewApi")
     @Nullable
-    public static Object convert(@Nullable final byte[] bytes) {
+    public static <T extends Serializable> T convert(@Nullable final byte[] bytes) {
         final String methodName = "Object convert(bytes)";
         try {
             try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
                  ObjectInput in = new ObjectInputStream(bis)) {
-                return in.readObject();
+                Object object = in.readObject();
+                return (T) object;
             }
         } catch (Exception e) {
             log(null, methodName, e, null);

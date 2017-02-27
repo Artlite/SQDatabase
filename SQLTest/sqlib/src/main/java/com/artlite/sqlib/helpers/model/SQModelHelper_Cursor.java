@@ -12,6 +12,7 @@ import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
 import java.util.Date;
 
 /**
+ * Class which provide the getting functional from the {@link Cursor} of the values
  * Created by Artli on 23.12.2016.
  */
 

@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.annotations.SQLimitation;
 import com.artlite.sqlib.helpers.abs.SQBaseHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -54,6 +55,7 @@ public final class SQParcelableHelper extends SQBaseHelper {
      * @param bitmap instance of {@link Bitmap}
      * @return instance of {@link Byte} array
      */
+    @NonNull
     public static byte[] convert(@Nullable final Bitmap bitmap) {
         final String methodName = "byte[] convert(bitmap)";
         try {
@@ -73,6 +75,8 @@ public final class SQParcelableHelper extends SQBaseHelper {
      * @param bitmap instance of {@link Bitmap}
      * @return scaled {@link Bitmap}
      */
+    @Nullable
+    @SQLimitation(message = "Maximum Bitmap resolution can be 600x600")
     private static Bitmap scaleIfNeeded(@Nullable final Bitmap bitmap) {
         if ((bitmap.getWidth() * bitmap.getHeight()) > K_MAX_RATIO) {
             int width = bitmap.getWidth();
@@ -99,7 +103,8 @@ public final class SQParcelableHelper extends SQBaseHelper {
      * @param bytes instance of {@link Byte} array
      * @return instance of {@link Parcel}
      */
-    public static Parcel convert(byte[] bytes) {
+    @Nullable
+    public static Parcel convert(@Nullable byte[] bytes) {
         final String methodName = "Parcel convert(bytes)";
         try {
             Parcel parcel = Parcel.obtain();
@@ -121,7 +126,9 @@ public final class SQParcelableHelper extends SQBaseHelper {
      * @param <T>     object type
      * @return instance of object
      */
-    public static <T> T convert(byte[] bytes, Parcelable.Creator<T> creator) {
+    @Nullable
+    public static <T> T convert(@Nullable byte[] bytes,
+                                @Nullable Parcelable.Creator<T> creator) {
         final String methodName = "T convert(byte[] bytes, Parcelable.Creator<T> creator)";
         try {
             Parcel parcel = convert(bytes);
@@ -140,6 +147,7 @@ public final class SQParcelableHelper extends SQBaseHelper {
      * @param bytes instance of {@link Byte}
      * @return instance of {@link Bitmap}
      */
+    @Nullable
     public static Bitmap convertToBitmap(@Nullable final byte[] bytes) {
         final String methodName = "Bitmap convertToBitmap(bytes)";
         try {

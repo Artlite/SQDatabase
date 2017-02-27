@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class which provide the projection functional
  * Created by Artli on 23.12.2016.
  */
 

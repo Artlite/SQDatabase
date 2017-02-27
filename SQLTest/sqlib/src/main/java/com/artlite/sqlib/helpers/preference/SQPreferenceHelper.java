@@ -2,12 +2,13 @@ package com.artlite.sqlib.helpers.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.helpers.abs.SQBaseHelper;
+import com.artlite.sqlib.helpers.convert.SQConvertHelper;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -23,8 +24,7 @@ public final class SQPreferenceHelper extends SQBaseHelper {
     /**
      * Constants
      */
-    protected static String K_FORMAT_DATE = "yyyy-MM-dd HH:mm:ss.S";
-    protected static final String SHARED_PREFERENCE_NAME = "SQ_SHARED_PREFERENCES";
+    protected static final String K_SHARED_PREFERENCE_NAME = "SQ_SHARED_PREFERENCES";
 
     /**
      * Method which provide the saving of the String value to the SharedPreferences
@@ -214,7 +214,7 @@ public final class SQPreferenceHelper extends SQBaseHelper {
     protected static SharedPreferences getPreferences(@Nullable final Context context) {
         final String methodName = "SharedPreferences getPreferences(context)";
         try {
-            return context.getSharedPreferences(SHARED_PREFERENCE_NAME, 0);
+            return context.getSharedPreferences(K_SHARED_PREFERENCE_NAME, 0);
         } catch (Exception ex) {
             log(null, methodName, ex, null);
         }
@@ -246,13 +246,7 @@ public final class SQPreferenceHelper extends SQBaseHelper {
      */
     @Nullable
     public static String convert(@Nullable final Date date) {
-        final String methodName = "String convert(date)";
-        try {
-            return new SimpleDateFormat(K_FORMAT_DATE).format(date);
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return null;
+        return SQConvertHelper.convert(date);
     }
 
     /**
@@ -263,13 +257,7 @@ public final class SQPreferenceHelper extends SQBaseHelper {
      */
     @Nullable
     public static Date convert(@Nullable final String date) {
-        final String methodName = "String convert(date)";
-        try {
-            return new SimpleDateFormat(K_FORMAT_DATE).parse(date);
-        } catch (Exception e) {
-            log(null, methodName, e, null);
-        }
-        return null;
+        return SQConvertHelper.convert(date);
     }
 
 }

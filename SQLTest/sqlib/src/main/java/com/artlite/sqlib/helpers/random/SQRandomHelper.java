@@ -9,7 +9,8 @@ import java.util.Random;
 public class SQRandomHelper {
     private static final int MIN_VALUE = 0;
     private static final int MAX_VALUE = 900000;
-    private static final String ALPHABET = "QWERTYUIOP{}ASDFGHJKL:|ZXCVBNM<>?qwertyuiop[]asdfghjkl;'zxcvbnm,./1234567890-=+_";
+    private static final String ALPHABET = "QWERTYUIOP{}ASDFGHJKL:|ZXCVBNM<>?qwertyuiop[]" +
+            "asdfghjkl;'zxcvbnm,./1234567890-=+_";
 
     /**
      * Method which provide the generating of the random integer value

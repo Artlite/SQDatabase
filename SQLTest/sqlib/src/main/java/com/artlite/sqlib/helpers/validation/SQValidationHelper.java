@@ -2,6 +2,7 @@ package com.artlite.sqlib.helpers.validation;
 
 import android.support.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Map;
 
@@ -11,6 +12,17 @@ import java.util.Map;
  */
 
 public final class SQValidationHelper {
+
+    /**
+     * Method which provide the validation for null elements
+     *
+     * @param objects objects for validate
+     * @return validation result
+     */
+    public static boolean isNull(@Nullable final Object... objects) {
+        return !nullValidate(objects);
+    }
+
     /**
      * Method which provide the validation for null elements
      *
@@ -27,6 +39,16 @@ public final class SQValidationHelper {
             }
         }
         return true;
+    }
+
+    /**
+     * Method which provide the empty validations
+     *
+     * @param objects objects for validate
+     * @return validation results
+     */
+    public static boolean isEmpty(@Nullable final Object... objects) {
+        return !emptyValidate(objects);
     }
 
     /**
@@ -63,6 +85,11 @@ public final class SQValidationHelper {
             } else if (object instanceof Map) {
                 //Map validate
                 if (((Map) object).isEmpty() == true) {
+                    return false;
+                }
+            } else if (object instanceof WeakReference) {
+                //Map validate
+                if (((WeakReference) object).get() == null) {
                     return false;
                 }
             }

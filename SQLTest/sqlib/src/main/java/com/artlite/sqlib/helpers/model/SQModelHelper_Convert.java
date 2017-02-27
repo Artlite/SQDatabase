@@ -1,6 +1,5 @@
 package com.artlite.sqlib.helpers.model;
 
-import android.annotation.SuppressLint;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,16 +8,10 @@ import com.artlite.sqlib.helpers.convert.SQConvertHelper;
 import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Class which provide the converting the functional
  * Created by dlernatovich on 12/22/2016.
  */
 
