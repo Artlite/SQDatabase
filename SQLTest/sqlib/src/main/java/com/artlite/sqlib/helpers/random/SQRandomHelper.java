@@ -82,6 +82,9 @@ public class SQRandomHelper extends SQBaseHelper {
             for (int i = 0; i < count; i++) {
                 int random = generateInt(0, words.length - 1);
                 String word = words[random];
+                if ((i == 0) && (word.length() > 1)) {
+                    word = Character.toUpperCase(word.charAt(0)) + word.substring(1);
+                }
                 builder.append(word).append(" ");
             }
         }
