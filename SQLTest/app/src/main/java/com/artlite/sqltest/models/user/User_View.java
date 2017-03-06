@@ -6,7 +6,9 @@ import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
 import com.artlite.adapteredrecyclerview.events.RecycleEvent;
+import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.adapteredrecyclerview.models.BaseObject;
 import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.model.SQModel;
@@ -31,11 +33,17 @@ abstract class User_View extends BaseObject implements SQModel {
      */
     protected static class ObjectView extends BaseRecyclerItem<User> {
 
+        @FindViewBy(id = R.id.label_name)
         private AppCompatTextView labelName;
+        @FindViewBy(id = R.id.label_about_me)
         private AppCompatTextView labelAboutMe;
+        @FindViewBy(id = R.id.image_delete)
         private ImageView imageDelete;
+        @FindViewBy(id = R.id.layout_image)
         private View layoutImage;
+        @FindViewBy(id = R.id.image_like)
         private ImageView imageLike;
+        @FindViewBy(id = R.id.image_avatar)
         private ImageView imageAvatar;
 
         /**
@@ -82,23 +90,11 @@ abstract class User_View extends BaseObject implements SQModel {
         }
 
         /**
-         * Method which provide the interface linking
-         */
-        @Override
-        protected void onLinkInterface() {
-            labelName = (AppCompatTextView) findViewById(R.id.label_name);
-            labelAboutMe = (AppCompatTextView) findViewById(R.id.label_about_me);
-            imageDelete = (ImageView) findViewById(R.id.image_delete);
-            layoutImage = findViewById(R.id.layout_image);
-            imageLike = (ImageView) findViewById(R.id.image_like);
-            imageAvatar = (ImageView) findViewById(R.id.image_avatar);
-        }
-
-        /**
          * Method which provide the action when {@link ObjectView} created
          */
         @Override
         protected void onCreateView() {
+            AdapteredInjector.inject(this);
             setOnClickListeners(imageDelete, layoutImage);
         }
 

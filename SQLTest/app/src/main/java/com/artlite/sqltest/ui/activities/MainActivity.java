@@ -6,10 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 
+import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
 import com.artlite.adapteredrecyclerview.callbacks.OnAdapteredBaseCallback;
 import com.artlite.adapteredrecyclerview.callbacks.OnAdapteredRefreshCallback;
 import com.artlite.adapteredrecyclerview.core.AdapteredView;
 import com.artlite.adapteredrecyclerview.events.RecycleEvent;
+import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.log.SQLogHelper;
@@ -29,6 +31,7 @@ import java.util.List;
  */
 public class MainActivity extends BaseActivity {
 
+    @FindViewBy(id = R.id.recycler_view)
     private AdapteredView adapteredView;
 
     /**
@@ -71,7 +74,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreateActivity() {
         setTitle(R.string.text_users);
-        adapteredView = (AdapteredView) findViewById(R.id.recycler_view);
+        AdapteredInjector.inject(this);
         customizeRecycler(adapteredView);
         receiveUsers();
     }

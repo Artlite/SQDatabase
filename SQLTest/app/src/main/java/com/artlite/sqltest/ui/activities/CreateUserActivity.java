@@ -6,16 +6,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
+import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
+import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.helpers.IntentHelper;
-import com.artlite.sqltest.helpers.RandomHelper;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.user.User;
@@ -29,10 +29,13 @@ import java.io.InputStream;
 public class CreateUserActivity extends BaseActivity {
 
     private static final int K_SELECT_PHOTO = 100;
-
+    @FindViewBy(id = R.id.edit_name)
     private AppCompatEditText editName;
+    @FindViewBy(id = R.id.edit_surname)
     private AppCompatEditText editSurname;
+    @FindViewBy(id = R.id.edit_about)
     private AppCompatEditText editAbout;
+    @FindViewBy(id = R.id.imageAvatar)
     private ImageView imageAvatar;
     private User user;
     private Bitmap avatar;
@@ -52,10 +55,7 @@ public class CreateUserActivity extends BaseActivity {
      */
     @Override
     protected void onCreateActivity() {
-        editName = (AppCompatEditText) findViewById(R.id.edit_name);
-        editSurname = (AppCompatEditText) findViewById(R.id.edit_surname);
-        editAbout = (AppCompatEditText) findViewById(R.id.edit_about);
-        imageAvatar = (ImageView) findViewById(R.id.imageAvatar);
+        AdapteredInjector.inject(this);
         onInitUser();
     }
 
