@@ -1,6 +1,8 @@
 package com.artlite.sqltest.ui.activities;
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +21,6 @@ import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.ThreadManager;
-import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.user.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
@@ -72,7 +73,7 @@ public class MainActivity extends BaseActivity {
      * Method which provide the action when Activity is created
      */
     @Override
-    protected void onCreateActivity() {
+    protected void onCreateActivity(Bundle bundle) {
         setTitle(R.string.text_users);
         AdapteredInjector.inject(this);
         customizeRecycler(adapteredView);
@@ -97,8 +98,12 @@ public class MainActivity extends BaseActivity {
         public void onItemClick(int index,
                                 @NonNull final User user) {
             SQLogHelper.log(MainActivity.this, "onItemClick", null, user);
-            TransferManager.getInstance().put(CreateUserActivity.class, user);
-            startActivity(CreateUserActivity.class);
+            startActivity(CreateUserActivity.class, new OnStartActivityCallback() {
+                @Override
+                public void onPreExecute(@NonNull Intent intent) {
+                    intent.putExtra(CreateUserActivity.K_KEY_USER, user);
+                }
+            });
         }
 
         @Override

@@ -12,4 +12,6 @@
     <dimen name="text_17">17sp</dimen>
     <dimen name="dimen_60">60dp</dimen>
     <dimen name="dimen_100">100dp</dimen>
+    <dimen name="dimen_150">150dp</dimen>
+    <dimen name="dimen_75">75dp</dimen>
 </resources>

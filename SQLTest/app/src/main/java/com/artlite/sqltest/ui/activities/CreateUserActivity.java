@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
@@ -17,7 +19,6 @@ import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.helpers.IntentHelper;
 import com.artlite.sqltest.managers.EventManager;
-import com.artlite.sqltest.managers.TransferManager;
 import com.artlite.sqltest.models.user.User;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
@@ -29,6 +30,8 @@ import java.io.InputStream;
 public class CreateUserActivity extends BaseActivity {
 
     private static final int K_SELECT_PHOTO = 100;
+    public static final String K_KEY_USER = "K_KEY_USER";
+
     @FindViewBy(id = R.id.edit_name)
     private AppCompatEditText editName;
     @FindViewBy(id = R.id.edit_surname)
@@ -54,16 +57,28 @@ public class CreateUserActivity extends BaseActivity {
      * Method which provide the action when Activity is created
      */
     @Override
-    protected void onCreateActivity() {
+    protected void onCreateActivity(Bundle bundle) {
         AdapteredInjector.inject(this);
-        onInitUser();
+        setOnClickListeners(imageAvatar);
+        onInitUser(bundle);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        bundle.putParcelable(K_KEY_USER, user);
+        super.onSaveInstanceState(bundle);
     }
 
     /**
      * Method which provide the {@link User} initializing
      */
-    protected final void onInitUser() {
-        user = TransferManager.getInstance().get(this);
+    protected final void onInitUser(Bundle bundle) {
+        final String methodName = "void onInitUser(bundle)";
+        try {
+            user = bundle.getParcelable(K_KEY_USER);
+        } catch (Exception ex) {
+            SQLogHelper.log(this, methodName, ex, null);
+        }
         if (user != null) {
             editName.setText(user.getName());
             editSurname.setText(user.getSurname());
@@ -122,11 +137,29 @@ public class CreateUserActivity extends BaseActivity {
     }
 
     /**
+     * Overriden method for the OnClickListener
+     *
+     * @param v current view
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imageAvatar: {
+                pickAvatar();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    /**
      * Method which provide the user creating and saving into the
      * {@link com.artlite.sqlib.core.SQDatabase}
      */
     private void createOrUpdate() {
-        if (validateFields(editName, editSurname, editAbout)) {
+        if (validate(editName, editSurname, editAbout)) {
             if (user == null) {
                 final User user = new User(editName.getText().toString(),
                         editSurname.getText().toString(),

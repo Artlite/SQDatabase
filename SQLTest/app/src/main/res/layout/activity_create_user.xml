@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_create_user"
     android:layout_width="match_parent"
@@ -19,11 +20,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageAvatar"
-                style="@style/styleCropImageCenter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <android.support.v7.widget.CardView
+                android:layout_width="@dimen/dimen_150"
+                android:layout_height="@dimen/dimen_150"
+                android:layout_gravity="center_horizontal"
+                android:innerRadius="0dp"
+                android:scaleType="centerCrop"
+                android:shape="ring"
+                app:cardCornerRadius="@dimen/dimen_75">
+
+                <ImageView
+                    style="@style/styleCropImageCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_user"
+                    android:tint="@android:color/darker_gray" />
+
+                <ImageView
+                    android:id="@+id/imageAvatar"
+                    style="@style/styleCropTrueImageCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.AppCompatEditText
                 android:id="@+id/edit_name"

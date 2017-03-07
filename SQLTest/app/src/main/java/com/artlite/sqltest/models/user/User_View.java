@@ -1,6 +1,7 @@
 package com.artlite.sqltest.models.user;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
@@ -18,11 +19,13 @@ import com.artlite.sqltest.R;
  * Created by dlernatovich on 2/15/2017.
  */
 
-abstract class User_View extends BaseObject implements SQModel {
+abstract class User_View extends BaseObject implements SQModel, Parcelable {
 
     protected static final String K_TABLE_NAME = User.class.getSimpleName();
     public static final RecycleEvent K_DELETE_USER = new RecycleEvent(100);
     public static final RecycleEvent K_ADD_TO_FAVORITE = new RecycleEvent(101);
+    protected static final int K_MAX_WIDTH = 150;
+    protected static final int K_MAX_HEIGHT = 150;
 
     //==============================================================================================
     //                                          VIEW

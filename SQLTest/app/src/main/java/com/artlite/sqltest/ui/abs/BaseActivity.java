@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -24,27 +26,31 @@ import com.artlite.sqltest.managers.EventManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener,
         EventManager.OnEventCallback {
+    private static final String TAG = BaseActivity.class.getName();
     protected static final int ON_BASE_ACTIVITY_RESULTS = 0x1;
     protected static final String ON_RESULT_EXTRA_KEY = "ON_RESULT_EXTRA_KEY";
-
-    /**
-     * Interface which provide the doing some action inside the Handler thread
-     */
-    protected interface OnActionPerformer {
-        void onActionPerform();
-    }
-
     protected static final int NONE_MENU = Integer.MIN_VALUE;
     protected final Handler MAIN_THREAD_HANDLER = new Handler();
 
+    /**
+     * Method which provide the action when {@link android.app.Activity} is created
+     *
+     * @param bundle instance of {@link Bundle}
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         setContentView(getLayoutId());
         EventManager.register(this, this);
-        onCreateActivity();
+        onCreateActivity((bundle == null) ? getIntent().getExtras() : bundle);
     }
 
+    /**
+     * Method which provide the create of the option menu
+     *
+     * @param menu instance of {@link Menu}
+     * @return creating result
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         int menuId = getMenuId();
@@ -101,9 +107,19 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * Method which provide starting the Activity
      *
      * @param activtyClass activity which should be starting
+     * @param callbacks    instances of {@link OnStartActivityCallback}
      */
-    protected void startActivity(Class activtyClass) {
-        startActivity(new Intent(this, activtyClass));
+    protected void startActivity(Class activtyClass,
+                                 @Nullable final OnStartActivityCallback... callbacks) {
+        final Intent intent = new Intent(this, activtyClass);
+        if ((callbacks != null) && (callbacks.length > 0)) {
+            for (final OnStartActivityCallback callback : callbacks) {
+                if (callback != null) {
+                    callback.onPreExecute(intent);
+                }
+            }
+        }
+        startActivity(intent);
     }
 
     //====================ACTIVITY FOR RESULT METHODS====================
@@ -112,11 +128,24 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * Method which provide starting the Activity for results
      *
      * @param activtyClass activity which should be starting
+     * @param callbacks    instances of {@link OnStartActivityCallback}
      */
-    protected void startActivityForResults(Class activtyClass) {
-        startActivityForResult(new Intent(this, activtyClass), ON_BASE_ACTIVITY_RESULTS);
+    protected void startActivityForResults(Class activtyClass,
+                                           @Nullable final OnStartActivityCallback... callbacks) {
+        final Intent intent = new Intent(this, activtyClass);
+        if ((callbacks != null) && (callbacks.length > 0)) {
+            for (final OnStartActivityCallback callback : callbacks) {
+                if (callback != null) {
+                    callback.onPreExecute(intent);
+                }
+            }
+        }
+        startActivityForResult(intent, ON_BASE_ACTIVITY_RESULTS);
     }
 
+    /**
+     * Dispatch incoming result to the correct fragment.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
@@ -156,10 +185,20 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * Method which provide starting the Service
      *
      * @param serviceClass service which should be starting
+     * @param callbacks    instances of {@link OnStartActivityCallback}
      */
-    protected void startService(Class serviceClass) {
+    protected void startService(Class serviceClass,
+                                @Nullable final OnStartActivityCallback... callbacks) {
         if (!isMyServiceRunning(serviceClass)) {
-            startService(new Intent(this, serviceClass));
+            final Intent intent = new Intent(this, serviceClass);
+            if ((callbacks != null) && (callbacks.length > 0)) {
+                for (final OnStartActivityCallback callback : callbacks) {
+                    if (callback != null) {
+                        callback.onPreExecute(intent);
+                    }
+                }
+            }
+            startService(intent);
         }
     }
 
@@ -195,7 +234,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      *
      * @param actionPerformer current action
      */
-    protected void runBackground(final OnActionPerformer actionPerformer) {
+    protected void onBackground(final OnActionPerformer actionPerformer) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -209,8 +248,8 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      *
      * @param actionPerformer current action
      */
-    protected void runMain(final OnActionPerformer actionPerformer) {
-        runMain(0, actionPerformer);
+    protected void onMain(final OnActionPerformer actionPerformer) {
+        onMain(0, actionPerformer);
     }
 
     /**
@@ -219,7 +258,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * @param delayTime       delaying time (in seconds)
      * @param actionPerformer current action
      */
-    protected void runMain(double delayTime, final OnActionPerformer actionPerformer) {
+    protected void onMain(double delayTime, final OnActionPerformer actionPerformer) {
         MAIN_THREAD_HANDLER.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -234,13 +273,13 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * @param editTexts list of {@link EditText}
      * @return checking value
      */
-    protected boolean validateFields(@Nullable final EditText... editTexts) {
+    protected boolean validate(@Nullable final EditText... editTexts) {
         if (editTexts != null) {
             for (final EditText editText : editTexts) {
                 if (editText != null) {
                     final String value = editText.getText().toString().trim();
                     if ((value == null) || (value.isEmpty())) {
-                        setErrorToEditText(editText,
+                        setError(editText,
                                 getResources().getString(R.string.text_required_field));
                         return false;
                     }
@@ -256,8 +295,23 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * @param view      current EditText
      * @param errorText error text
      */
-    protected void setErrorToEditText(@Nullable final EditText view,
-                                      @Nullable final String errorText) {
+    protected void setError(@Nullable final EditText view,
+                            @StringRes int errorText) {
+        try {
+            setError(view, getResources().getString(errorText));
+        } catch (Exception ex) {
+            Log.e(TAG, ex.toString());
+        }
+    }
+
+    /**
+     * Method which provide the set error to EditText
+     *
+     * @param view      current EditText
+     * @param errorText error text
+     */
+    protected void setError(@Nullable final EditText view,
+                            @Nullable final String errorText) {
         if ((view != null)) {
             view.setError(errorText);
             view.requestFocus();
@@ -278,7 +332,9 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         SQLogHelper.log(this, "public void onEvent(event)", null, event);
     }
 
-    //==========================ABSTRACT METHODS==============================
+    //==============================================================================================
+    //                                      ABSTRACT METHODS
+    //==============================================================================================
 
     /**
      * Method which provide the getting of the layout ID for the current Activity
@@ -300,7 +356,33 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     /**
      * Method which provide the action when Activity is created
      */
-    protected abstract void onCreateActivity();
+    protected abstract void onCreateActivity(Bundle bundle);
+
+    //==============================================================================================
+    //                                          CALLBACKS
+    //==============================================================================================
+
+    /**
+     * Callback which provide the action with intent before start {@link android.app.Activity}
+     */
+    protected interface OnStartActivityCallback {
+        /**
+         * Method which provide the action before starting activity
+         *
+         * @param intent instance of {@link Intent}
+         */
+        void onPreExecute(@NonNull final Intent intent);
+    }
+
+    /**
+     * Interface which provide the doing some action inside the Handler thread
+     */
+    protected interface OnActionPerformer {
+        /**
+         * Method which provide the action perform
+         */
+        void onActionPerform();
+    }
 
     //TODO Example for the onOptionsItemSelected
     //    @Override

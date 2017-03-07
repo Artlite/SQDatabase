@@ -3,12 +3,15 @@ package com.artlite.sqltest.models.user;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
+import com.artlite.sqlib.helpers.validation.SQValidationHelper;
+import com.artlite.sqlib.model.SQBitmap;
 import com.artlite.sqlib.model.SQModel;
 import com.artlite.sqltest.models.address.Address;
 
@@ -32,7 +35,7 @@ public class User extends User_View {
     @SQField
     private boolean favorite = false;
     @SQField
-    private Bitmap avatar;
+    private SQBitmap avatar;
     @SQField
     private Address address;
 
@@ -50,7 +53,7 @@ public class User extends User_View {
         this.name = name;
         this.surname = surname;
         this.aboutMe = aboutMe;
-        this.avatar = avatar;
+        this.avatar = new SQBitmap(avatar, K_MAX_WIDTH, K_MAX_HEIGHT);
         this.address = new Address();
     }
 
@@ -97,7 +100,7 @@ public class User extends User_View {
         this.aboutMe = SQModelHelper.getString(cursor, "aboutMe");
         this.creation = SQModelHelper.getDate(cursor, "creation");
         this.address = SQModelHelper.getObject(cursor, Address.CREATOR, "address");
-        this.avatar = SQModelHelper.getBitmap(cursor, "avatar");
+        this.avatar = SQModelHelper.getObject(cursor, SQBitmap.CREATOR, "avatar");
         setFavorite(SQModelHelper.getBoolean(cursor, "favorite"));
     }
 
@@ -222,8 +225,12 @@ public class User extends User_View {
      *
      * @return instance of {@link Bitmap}
      */
+    @Nullable
     public Bitmap getAvatar() {
-        return avatar;
+        if (SQValidationHelper.isEmpty(avatar)) {
+            return null;
+        }
+        return avatar.getBitmap();
     }
 
     /**
@@ -232,7 +239,7 @@ public class User extends User_View {
      * @param avatar instance of {@link Bitmap}
      */
     public void setAvatar(Bitmap avatar) {
-        this.avatar = avatar;
+        this.avatar = new SQBitmap(avatar, K_MAX_WIDTH, K_MAX_HEIGHT);
     }
 
     /**
@@ -262,4 +269,92 @@ public class User extends User_View {
                 ", favorite=" + favorite +
                 '}';
     }
+
+    /**
+     * Method which provide the equaling of the objects
+     *
+     * @param object instance of {@link Object}
+     * @return equaling results
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return id == user.id;
+    }
+
+    /**
+     * Method which provide the hash code functional for {@link User}
+     *
+     * @return hash code for {@link User}
+     */
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    //==============================================================================================
+    //                                   PARCELABLE
+    //==============================================================================================
+
+    /**
+     * Method which provide the describing content for the {@link User}
+     *
+     * @return describing content of the {@link User}
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Method which provide the write {@link User} to {@link Parcel}
+     *
+     * @param parcel instance of {@link Parcel}
+     * @param flags  args value
+     */
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(this.id);
+        parcel.writeString(this.name);
+        parcel.writeString(this.surname);
+        parcel.writeString(this.aboutMe);
+        parcel.writeLong(this.creation != null ? this.creation.getTime() : -1);
+        parcel.writeByte(this.favorite ? (byte) 1 : (byte) 0);
+        parcel.writeParcelable(this.avatar, flags);
+        parcel.writeParcelable(this.address, flags);
+    }
+
+    /**
+     * Constructor which provide the create of the {@link User} from
+     *
+     * @param parcel instance of {@link Parcel}
+     */
+    protected User(Parcel parcel) {
+        this.id = parcel.readInt();
+        this.name = parcel.readString();
+        this.surname = parcel.readString();
+        this.aboutMe = parcel.readString();
+        long tmpCreation = parcel.readLong();
+        this.creation = tmpCreation == -1 ? null : new Date(tmpCreation);
+        this.favorite = parcel.readByte() != 0;
+        this.avatar = parcel.readParcelable(SQBitmap.class.getClassLoader());
+        this.address = parcel.readParcelable(Address.class.getClassLoader());
+    }
+
+    /**
+     * Creator field
+     */
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel source) {
+            return new User(source);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
