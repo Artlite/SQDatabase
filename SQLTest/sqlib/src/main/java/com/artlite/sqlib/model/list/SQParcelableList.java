@@ -27,7 +27,7 @@ public abstract class SQParcelableList<T extends Parcelable> extends SQAbstractL
      * @param parcel instance of {@link Parcel}
      */
     protected SQParcelableList(Parcel parcel) {
-        super();
+        super(parcel);
         parcel.readTypedList(this.objects, getCreator());
     }
 
@@ -53,6 +53,7 @@ public abstract class SQParcelableList<T extends Parcelable> extends SQAbstractL
      */
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
         parcel.writeTypedList(this.objects);
     }
 

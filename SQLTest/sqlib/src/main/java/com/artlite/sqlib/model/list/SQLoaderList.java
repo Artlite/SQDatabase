@@ -26,7 +26,7 @@ abstract class SQLoaderList<T> extends SQAbstractList<T> {
      * @param parcel instance of {@link Parcel}
      */
     protected SQLoaderList(Parcel parcel) {
-        super();
+        super(parcel);
         parcel.readList(this.objects, getLoader());
     }
 
@@ -52,6 +52,7 @@ abstract class SQLoaderList<T> extends SQAbstractList<T> {
      */
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
         parcel.writeList(this.objects);
     }
 

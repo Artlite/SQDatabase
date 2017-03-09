@@ -1,5 +1,6 @@
 package com.artlite.sqlib.model.list;
 
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
@@ -12,6 +13,22 @@ import java.util.ListIterator;
  */
 
 abstract class SQAbstractList<T> extends SQList<T> {
+
+    /**
+     * Default constructor
+     */
+    protected SQAbstractList() {
+        super();
+    }
+
+    /**
+     * Constructor which provide the create {@link SQLoaderList} from {@link Parcel}
+     *
+     * @param parcel instance of {@link Parcel}
+     */
+    protected SQAbstractList(Parcel parcel) {
+        super(parcel);
+    }
 
     /**
      * Method which provide the getting of the objects {@link List} size
