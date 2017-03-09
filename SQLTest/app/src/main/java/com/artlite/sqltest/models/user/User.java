@@ -9,12 +9,22 @@ import android.support.annotation.Nullable;
 
 import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
 import com.artlite.sqlib.annotations.SQField;
+import com.artlite.sqlib.constants.SQListType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
+import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
 import com.artlite.sqlib.model.SQBitmap;
 import com.artlite.sqlib.model.SQModel;
+import com.artlite.sqlib.model.list.SQBooleanList;
+import com.artlite.sqlib.model.list.SQDoubleList;
+import com.artlite.sqlib.model.list.SQFloatList;
+import com.artlite.sqlib.model.list.SQIntegerList;
+import com.artlite.sqlib.model.list.SQLongList;
+import com.artlite.sqlib.model.list.SQStringList;
 import com.artlite.sqltest.models.address.Address;
+import com.artlite.sqltest.models.address.AddressList;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -38,6 +48,21 @@ public class User extends User_View {
     private SQBitmap avatar;
     @SQField
     private Address address;
+    //Lists
+    @SQField
+    private SQBooleanList booleans;
+    @SQField
+    private SQDoubleList doubles;
+    @SQField
+    private SQFloatList floats;
+    @SQField
+    private SQIntegerList integers;
+    @SQField
+    private SQLongList longs;
+    @SQField
+    private SQStringList strings;
+    @SQField
+    private AddressList addresses;
 
     /**
      * Constructor which provide the create {@link User} from
@@ -55,6 +80,24 @@ public class User extends User_View {
         this.aboutMe = aboutMe;
         this.avatar = new SQBitmap(avatar, K_MAX_WIDTH, K_MAX_HEIGHT);
         this.address = new Address();
+        //List functional
+        this.addresses = new AddressList();
+        this.longs = new SQLongList();
+        this.booleans = new SQBooleanList();
+        this.doubles = new SQDoubleList();
+        this.floats = new SQFloatList();
+        this.integers = new SQIntegerList();
+        this.strings = new SQStringList();
+        //Fill lists
+        this.addresses.addAll(Arrays.asList(new Address(), new Address()));
+        this.longs.addAll(Arrays.asList(new Long(10), new Long(20), new Long(30)));
+        this.booleans.addAll(Arrays.asList(true, false, false));
+        this.doubles.addAll(Arrays.asList(12.3, 12.5, 15.0));
+        this.floats.addAll(Arrays.asList(new Float(12.3), new Float(12.5), new Float(15.0)));
+        this.integers.addAll(Arrays.asList(12, 13, 15));
+        this.strings.addAll(Arrays.asList(SQRandomHelper.generateString(10),
+                SQRandomHelper.generateString(10),
+                SQRandomHelper.generateString(10)));
     }
 
     /**
@@ -101,6 +144,13 @@ public class User extends User_View {
         this.creation = SQModelHelper.getDate(cursor, "creation");
         this.address = SQModelHelper.getObject(cursor, Address.CREATOR, "address");
         this.avatar = SQModelHelper.getObject(cursor, SQBitmap.CREATOR, "avatar");
+        //Get lists
+        this.addresses = SQModelHelper.getList(cursor, AddressList.CREATOR, "addresses");
+        this.booleans = SQModelHelper.getList(cursor, SQListType.BOOLEAN, "booleans");
+        this.doubles = SQModelHelper.getList(cursor, SQListType.DOUBLE, "doubles");
+        this.floats = SQModelHelper.getList(cursor, SQListType.FLOAT, "floats");
+        this.integers = SQModelHelper.getList(cursor, SQListType.INTEGER, "integers");
+        this.strings = SQModelHelper.getList(cursor, SQListType.STRING, "strings");
         setFavorite(SQModelHelper.getBoolean(cursor, "favorite"));
     }
 

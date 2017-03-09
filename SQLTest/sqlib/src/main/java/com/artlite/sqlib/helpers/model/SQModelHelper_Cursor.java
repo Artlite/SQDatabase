@@ -7,9 +7,18 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.constants.SQListType;
 import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
+import com.artlite.sqlib.model.list.SQBooleanList;
+import com.artlite.sqlib.model.list.SQDoubleList;
+import com.artlite.sqlib.model.list.SQFloatList;
+import com.artlite.sqlib.model.list.SQIntegerList;
+import com.artlite.sqlib.model.list.SQList;
+import com.artlite.sqlib.model.list.SQLongList;
+import com.artlite.sqlib.model.list.SQStringList;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Class which provide the getting functional from the {@link Cursor} of the values
@@ -197,5 +206,76 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
         }
         return null;
     }
+
+    //==============================================================================================
+    //                                          LIST
+    //==============================================================================================
+
+    /**
+     * Method which provide the reading {@link List} from {@link Cursor}
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param type      instance of {@link SQListType}
+     * @param fieldName field name
+     * @param <T>       object type
+     * @return instance of {@link List}
+     */
+    @NonNull
+    public static <T extends SQList> T getList(@Nullable final Cursor cursor,
+                                               @Nullable final SQListType type,
+                                               @Nullable final String fieldName) {
+        final String methodName = "List<T> getList(cursor, type, fieldName)";
+        try {
+            byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
+            switch (type) {
+                case BOOLEAN: {
+                    return (T) SQParcelableHelper.convert(bytes, SQBooleanList.CREATOR);
+                }
+                case DOUBLE: {
+                    return (T) SQParcelableHelper.convert(bytes, SQDoubleList.CREATOR);
+                }
+                case FLOAT: {
+                    return (T) SQParcelableHelper.convert(bytes, SQFloatList.CREATOR);
+                }
+                case INTEGER: {
+                    return (T) SQParcelableHelper.convert(bytes, SQIntegerList.CREATOR);
+                }
+                case LONG: {
+                    return (T) SQParcelableHelper.convert(bytes, SQLongList.CREATOR);
+                }
+                case STRING: {
+                    return (T) SQParcelableHelper.convert(bytes, SQStringList.CREATOR);
+                }
+            }
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return null;
+    }
+
+    /**
+     * Method which provide the getting the {@link List} of objects from
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param creator   instance of {@link Parcelable.Creator}
+     * @param fieldName field name
+     * @param <T>       object type
+     * @return {@link List} type
+     */
+    @Nullable
+    public static <T extends SQList> T getList(@Nullable final Cursor cursor,
+                                               @Nullable final Parcelable.Creator<T> creator,
+                                               @Nullable final String fieldName) {
+        final String methodName = "List<T> getList(cursor, creator, fieldName)";
+        try {
+            byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
+            Object object = SQParcelableHelper.convert(bytes, creator);
+            return (T) object;
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return null;
+    }
+
 
 }
