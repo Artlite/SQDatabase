@@ -16,6 +16,7 @@ import com.artlite.sqlib.model.list.SQIntegerList;
 import com.artlite.sqlib.model.list.SQList;
 import com.artlite.sqlib.model.list.SQLongList;
 import com.artlite.sqlib.model.list.SQStringList;
+import com.artlite.sqlib.model.model.SQMap;
 
 import java.util.Date;
 import java.util.List;
@@ -266,15 +267,23 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
     public static <T extends SQList> T getList(@Nullable final Cursor cursor,
                                                @Nullable final Parcelable.Creator<T> creator,
                                                @Nullable final String fieldName) {
-        final String methodName = "List<T> getList(cursor, creator, fieldName)";
-        try {
-            byte[] bytes = cursor.getBlob(cursor.getColumnIndexOrThrow(fieldName));
-            Object object = SQParcelableHelper.convert(bytes, creator);
-            return (T) object;
-        } catch (Exception ex) {
-            log(null, methodName, ex, null);
-        }
-        return null;
+        return getObject(cursor, creator, fieldName);
+    }
+
+    /**
+     * Method which provide the getting the {@link SQMap} of objects from
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param creator   instance of {@link Parcelable.Creator}
+     * @param fieldName field name
+     * @param <T>       object type
+     * @return {@link SQMap} type
+     */
+    @Nullable
+    public static <T extends SQMap> T getMap(@Nullable final Cursor cursor,
+                                             @Nullable final Parcelable.Creator<T> creator,
+                                             @Nullable final String fieldName) {
+        return getObject(cursor, creator, fieldName);
     }
 
 

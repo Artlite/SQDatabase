@@ -23,6 +23,7 @@ import com.artlite.sqlib.model.list.SQLongList;
 import com.artlite.sqlib.model.list.SQStringList;
 import com.artlite.sqltest.models.address.Address;
 import com.artlite.sqltest.models.address.AddressList;
+import com.artlite.sqltest.models.address.AddressMap;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -63,6 +64,8 @@ public class User extends User_View {
     private SQStringList strings;
     @SQField
     private AddressList addresses;
+    @SQField
+    private AddressMap addressMap;
 
     /**
      * Constructor which provide the create {@link User} from
@@ -88,6 +91,7 @@ public class User extends User_View {
         this.floats = new SQFloatList();
         this.integers = new SQIntegerList();
         this.strings = new SQStringList();
+        this.addressMap = new AddressMap();
         //Fill lists
         this.addresses.addAll(Arrays.asList(new Address(), new Address()));
         this.longs.addAll(Arrays.asList(new Long(10), new Long(20), new Long(30)));
@@ -98,6 +102,9 @@ public class User extends User_View {
         this.strings.addAll(Arrays.asList(SQRandomHelper.generateString(10),
                 SQRandomHelper.generateString(10),
                 SQRandomHelper.generateString(10)));
+        for (int i = 0; i < 10; i++) {
+            this.addressMap.put(SQRandomHelper.generateString(10), new Address());
+        }
     }
 
     /**
@@ -151,6 +158,7 @@ public class User extends User_View {
         this.floats = SQModelHelper.getList(cursor, SQListType.FLOAT, "floats");
         this.integers = SQModelHelper.getList(cursor, SQListType.INTEGER, "integers");
         this.strings = SQModelHelper.getList(cursor, SQListType.STRING, "strings");
+        this.addressMap = SQModelHelper.getMap(cursor, AddressMap.CREATOR, "addressMap");
         setFavorite(SQModelHelper.getBoolean(cursor, "favorite"));
     }
 
