@@ -25,7 +25,6 @@ import com.artlite.sqltest.models.address.Address;
 import com.artlite.sqltest.models.address.AddressList;
 import com.artlite.sqltest.models.address.AddressMap;
 
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -93,16 +92,14 @@ public class User extends User_View {
         this.strings = new SQStringList();
         this.addressMap = new AddressMap();
         //Fill lists
-        this.addresses.addAll(Arrays.asList(new Address(), new Address()));
-        this.longs.addAll(Arrays.asList(new Long(10), new Long(20), new Long(30)));
-        this.booleans.addAll(Arrays.asList(true, false, false));
-        this.doubles.addAll(Arrays.asList(12.3, 12.5, 15.0));
-        this.floats.addAll(Arrays.asList(new Float(12.3), new Float(12.5), new Float(15.0)));
-        this.integers.addAll(Arrays.asList(12, 13, 15));
-        this.strings.addAll(Arrays.asList(SQRandomHelper.generateString(10),
-                SQRandomHelper.generateString(10),
-                SQRandomHelper.generateString(10)));
         for (int i = 0; i < 10; i++) {
+            this.addresses.add(new Address());
+            this.longs.add(new Long(SQRandomHelper.generateInt()));
+            this.booleans.add(true);
+            this.doubles.add(new Double(SQRandomHelper.generateInt()));
+            this.floats.add(new Float(SQRandomHelper.generateInt()));
+            this.integers.add(SQRandomHelper.generateInt());
+            this.strings.add(SQRandomHelper.generateString(10));
             this.addressMap.put(SQRandomHelper.generateString(10), new Address());
         }
     }
