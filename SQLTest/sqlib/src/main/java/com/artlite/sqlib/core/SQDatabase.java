@@ -166,9 +166,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> delete(@Nullable final Class ownerClass,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+    public static <T extends SQModel> List<T> delete(@Nullable final Class ownerClass,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         return delete(ownerClass, ownerClass.getSimpleName(), callback, filters);
     }
 
@@ -179,10 +179,10 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> delete(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+    public static <T extends SQModel> List<T> delete(@Nullable final Class ownerClass,
+                                                     @Nullable final String tableName,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         final String methodName = "List<Cursor> delete(ownerClass, tableName, callback, filters)";
         final List<T> result = new ArrayList<>();
         if (ownerClass != null) {
@@ -279,7 +279,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param callback   instance of {@link SQCursorCallback}
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                         @Nullable final String query,
                                                         @Nullable final SQCursorCallback<T> callback) {
         final List<T> result = new ArrayList<>();
@@ -297,7 +297,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param callback   instance of {@link SQCursorCallback}
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                         @Nullable final String tableName,
                                                         @Nullable final String query,
                                                         @Nullable final SQCursorCallback<T> callback) {
@@ -326,9 +326,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                         @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+                                                        @Nullable final SQFilter... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
             result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
@@ -343,10 +343,10 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> search(@Nullable final Class ownerClass,
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                         @Nullable final String tableName,
                                                         @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+                                                        @Nullable final SQFilter... filters) {
         return select(true, ownerClass, tableName, callback, filters);
     }
 
@@ -360,9 +360,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> select(@Nullable final Class ownerClass,
+    public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                         @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+                                                        @Nullable final SQFilter... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
             result.addAll(select(ownerClass, ownerClass.getSimpleName(), callback, filters));
@@ -377,10 +377,10 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    public static <T extends SQModel, K> List<T> select(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter<K>... filters) {
+    public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
+                                                     @Nullable final String tableName,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         return select(false, ownerClass, tableName, callback, filters);
     }
 
@@ -392,11 +392,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @param ownerClass owner class
      * @return list of {@link Cursor}
      */
-    protected static <T extends SQModel, K> List<T> select(boolean isSearch,
-                                                           @Nullable final Class ownerClass,
-                                                           @Nullable final String tableName,
-                                                           @Nullable final SQCursorCallback<T> callback,
-                                                           @Nullable final SQFilter<K>... filters) {
+    protected static <T extends SQModel> List<T> select(boolean isSearch,
+                                                        @Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final SQFilter... filters) {
         final String methodName = "List<Cursor> select(tableName, ownerClass)";
         List<T> result = new ArrayList<>();
         try {
