@@ -438,7 +438,7 @@ public final class SQDatabase extends SQLoggableObject {
                 final SQFilter filter = filters[i];
                 if (validate(filter)) {
                     final String filterValue = filter.getFilter();
-                    final String delimiter = filter.getDelimiter();
+                    final String delimiter = filter.getDelimiterValue();
                     if (validate(filterValue, delimiter)) {
                         if (i > 0) {
                             result.append(delimiter);
