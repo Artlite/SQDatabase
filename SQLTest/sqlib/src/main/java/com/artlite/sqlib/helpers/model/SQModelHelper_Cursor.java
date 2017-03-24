@@ -16,7 +16,7 @@ import com.artlite.sqlib.model.list.SQIntegerList;
 import com.artlite.sqlib.model.list.SQList;
 import com.artlite.sqlib.model.list.SQLongList;
 import com.artlite.sqlib.model.list.SQStringList;
-import com.artlite.sqlib.model.model.SQMap;
+import com.artlite.sqlib.model.map.SQMap;
 
 import java.util.Date;
 import java.util.List;

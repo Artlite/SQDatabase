@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.artlite.sqlib.model.model.SQMap;
+import com.artlite.sqlib.model.map.SQMap;
 
 /**
  * Created by dlernatovich on 3/14/2017.

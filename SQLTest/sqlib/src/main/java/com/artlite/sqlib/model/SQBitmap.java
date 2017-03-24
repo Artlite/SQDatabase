@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.constants.Constants;
 import com.artlite.sqlib.helpers.bitmap.SQBitmapHelper;
 import com.artlite.sqlib.helpers.parcelable.SQParcelableHelper;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
@@ -17,15 +18,6 @@ import com.artlite.sqlib.log.SQLoggableObject;
  */
 
 public final class SQBitmap extends SQLoggableObject implements Parcelable {
-
-    //==============================================================================================
-    //                                     CONSTANTS
-    //==============================================================================================
-
-    /**
-     * ID length
-     */
-    private static final int K_ID_LENGTH = 20;
 
     //==============================================================================================
     //                                       FIELDS
@@ -62,7 +54,7 @@ public final class SQBitmap extends SQLoggableObject implements Parcelable {
                     @IntRange(from = 1, to = 600) int height) {
         this.height = height;
         this.width = width;
-        this.id = SQRandomHelper.generateString(K_ID_LENGTH);
+        this.id = SQRandomHelper.generateString(Constants.K_ID_LENGTH);
     }
 
     /**

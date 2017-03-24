@@ -2,7 +2,9 @@ package com.artlite.sqlib.model.list;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+import com.artlite.sqlib.constants.Constants;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
 
 import java.util.ArrayList;
@@ -13,8 +15,6 @@ import java.util.List;
  */
 
 public abstract class SQList<T> implements Parcelable, List<T> {
-
-    private static final int K_ID_LENGTH = 20;
 
     /**
      * Objects {@link List}
@@ -27,8 +27,12 @@ public abstract class SQList<T> implements Parcelable, List<T> {
      */
     protected SQList() {
         this.objects = new ArrayList<>();
-        this.id = SQRandomHelper.generateString(K_ID_LENGTH);
+        this.id = SQRandomHelper.generateString(Constants.K_ID_LENGTH);
     }
+
+    //==============================================================================================
+    //                                    PARCELABLE
+    //==============================================================================================
 
     /**
      * Constructor which provide the create {@link SQLoaderList} from {@link Parcel}
@@ -50,6 +54,10 @@ public abstract class SQList<T> implements Parcelable, List<T> {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(id);
     }
+
+    //==============================================================================================
+    //                                    EQUALS/HASH CODE
+    //==============================================================================================
 
     /**
      * Method which provide the equaling of the {@link SQList} objects
@@ -74,5 +82,15 @@ public abstract class SQList<T> implements Parcelable, List<T> {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    /**
+     * Method which provide the getting of the object {@link List}
+     *
+     * @return object {@link List}
+     */
+    @NonNull
+    public List<T> getList() {
+        return objects;
     }
 }

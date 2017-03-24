@@ -1,10 +1,12 @@
-package com.artlite.sqlib.model.model;
+package com.artlite.sqlib.model.map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.artlite.sqlib.constants.Constants;
+import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
 
 import java.util.Collection;
@@ -26,6 +28,7 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
      * Map with object
      */
     private final Map<K, V> map;
+    private String id;
 
     //==============================================================================================
     //                                    CONSTRUCTORS
@@ -36,6 +39,7 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
      */
     public SQMap() {
         map = new HashMap<>();
+        id = SQRandomHelper.generateString(Constants.K_ID_LENGTH);
     }
 
     /**
@@ -44,6 +48,7 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
      * @param parcel instance of {@link Parcel}
      */
     protected SQMap(Parcel parcel) {
+        this.id = parcel.readString();
         int mapSize = parcel.readInt();
         this.map = new HashMap<K, V>();
         for (int i = 0; i < mapSize; i++) {
@@ -187,6 +192,9 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
         return map.entrySet();
     }
 
+    //==============================================================================================
+    //                                    PARCELABLE
+    //==============================================================================================
 
     /**
      * Method which provide the describing of the {@link SQMap}
@@ -206,6 +214,7 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
      */
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(id);
         parcel.writeInt(this.map.size());
         for (Entry<K, V> entry : this.map.entrySet()) {
             K key = entry.getKey();
@@ -216,6 +225,35 @@ public abstract class SQMap<K, V> implements Map<K, V>, Parcelable {
             }
         }
     }
+
+    //==============================================================================================
+    //                                    EQUALS/HASH CODE
+    //==============================================================================================
+
+    /**
+     * Method which provide the equaling of the {@link SQMap} objects
+     *
+     * @param object instance of {@link Object}
+     * @return equaling result
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        SQMap<?, ?> sqMap = (SQMap<?, ?>) object;
+        return id.equals(sqMap.id);
+    }
+
+    /**
+     * Method which provide the generating of the hash code for the {@link SQMap}
+     *
+     * @return hash code for the {@link SQMap}
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
 
     //==============================================================================================
     //                                    ABSTRACT METHODS
