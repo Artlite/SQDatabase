@@ -3,6 +3,7 @@ package com.artlite.sqlib.model.list;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.artlite.sqlib.constants.Constants;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
@@ -92,5 +93,15 @@ public abstract class SQList<T> implements Parcelable, List<T> {
     @NonNull
     public List<T> getList() {
         return objects;
+    }
+
+    /**
+     * Method which provide the setting of the {@link List} of objects
+     *
+     * @param objects {@link List} of objects
+     */
+    public void setList(@Nullable final List<T> objects) {
+        this.objects.clear();
+        this.objects.addAll(objects);
     }
 }
