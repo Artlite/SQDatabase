@@ -76,7 +76,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param objects objects
      * @param <T>     objects type
      */
-    public synchronized static <T extends SQModel> boolean insert(@Nullable final T... objects) {
+    public static <T extends SQModel> boolean insert(@Nullable final T... objects) {
         boolean result = true;
         if (validate(objects)) {
             for (final T object : objects) {
@@ -94,7 +94,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param object objects
      * @param <T>    objects type
      */
-    public synchronized static <T extends SQModel> boolean insert(@Nullable final T object) {
+    public static <T extends SQModel> boolean insert(@Nullable final T object) {
         final String methodName = "boolean insert(object)";
         final ContentValues contentValue = SQModelHelper.getContentValue(object);
         final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
@@ -123,7 +123,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param <T>     object type
      * @return execution results
      */
-    public synchronized static <T extends SQModel> boolean delete(@Nullable final T... objects) {
+    public static <T extends SQModel> boolean delete(@Nullable final T... objects) {
         final String methodName = "boolean delete(objects)";
         boolean result = true;
         if (objects != null) {
@@ -143,7 +143,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param <T>    object type
      * @return execution results
      */
-    public synchronized static <T extends SQModel> boolean delete(@Nullable final T object) {
+    public static <T extends SQModel> boolean delete(@Nullable final T object) {
         final String methodName = "boolean delete(object)";
         final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
         final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
@@ -212,7 +212,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param <T>     objects type
      * @return update result
      */
-    public static synchronized <T extends SQModel> boolean update(@Nullable final T... objects) {
+    public static <T extends SQModel> boolean update(@Nullable final T... objects) {
         boolean result = true;
         if (validate(objects)) {
             for (final T object : objects) {
@@ -230,7 +230,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param object objects
      * @param <T>    objects type
      */
-    public synchronized static <T extends SQModel> boolean update(@Nullable final T object) {
+    public static <T extends SQModel> boolean update(@Nullable final T object) {
         final String methodName = "boolean update(object)";
         final ContentValues contentValue = SQModelHelper.getContentValue(object);
         final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
@@ -255,7 +255,7 @@ public final class SQDatabase extends SQLoggableObject {
      * @param object objects
      * @param <T>    objects type
      */
-    protected synchronized static <T extends SQModel> boolean create(@Nullable final T object) {
+    protected static <T extends SQModel> boolean create(@Nullable final T object) {
         final String methodName = "boolean create(object)";
         try {
             getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(getContext(),
@@ -280,8 +280,8 @@ public final class SQDatabase extends SQLoggableObject {
      * @return list of {@link Cursor}
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final String query,
-                                                        @Nullable final SQCursorCallback<T> callback) {
+                                                     @Nullable final String query,
+                                                     @Nullable final SQCursorCallback<T> callback) {
         final List<T> result = new ArrayList<>();
         if (validate(ownerClass)) {
             result.addAll(search(ownerClass, ownerClass.getSimpleName(), query, callback));
@@ -298,9 +298,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @return list of {@link Cursor}
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final String query,
-                                                        @Nullable final SQCursorCallback<T> callback) {
+                                                     @Nullable final String tableName,
+                                                     @Nullable final String query,
+                                                     @Nullable final SQCursorCallback<T> callback) {
         final List<SQFilter<String>> filters = new ArrayList<>();
         if (SQValidationHelper.emptyValidate(ownerClass, query)) {
             SQAnnotationHelper.annotate(ownerClass, new SQAnnotationClassCallback() {
@@ -327,8 +327,8 @@ public final class SQDatabase extends SQLoggableObject {
      * @return list of {@link Cursor}
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter... filters) {
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
             result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
@@ -344,9 +344,9 @@ public final class SQDatabase extends SQLoggableObject {
      * @return list of {@link Cursor}
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
-                                                        @Nullable final String tableName,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter... filters) {
+                                                     @Nullable final String tableName,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         return select(true, ownerClass, tableName, callback, filters);
     }
 
@@ -361,8 +361,8 @@ public final class SQDatabase extends SQLoggableObject {
      * @return list of {@link Cursor}
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
-                                                        @Nullable final SQCursorCallback<T> callback,
-                                                        @Nullable final SQFilter... filters) {
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final SQFilter... filters) {
         List<T> result = new ArrayList<>();
         if (ownerClass != null) {
             result.addAll(select(ownerClass, ownerClass.getSimpleName(), callback, filters));
@@ -495,10 +495,12 @@ public final class SQDatabase extends SQLoggableObject {
      */
     @Nullable
     protected static SQLiteDatabase getDatabase(@Nullable final SQDatabaseType type) {
-        if ((instance != null) && (instance.openHelper != null)) {
-            return instance.openHelper.getDatabase(type);
+        synchronized (instance) {
+            if ((instance != null) && (instance.openHelper != null)) {
+                return instance.openHelper.getDatabase(type);
+            }
+            return null;
         }
-        return null;
     }
 
     /**
