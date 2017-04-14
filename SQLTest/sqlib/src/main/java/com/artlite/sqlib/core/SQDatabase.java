@@ -96,20 +96,17 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> boolean insert(@Nullable final T object) {
         final String methodName = "boolean insert(object)";
-        final ContentValues contentValue = SQModelHelper.getContentValue(object);
-        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
-        if ((database != null) && (contentValue != null)) {
-            try {
-                if (create(object)) {
-                    database.insertOrThrow(object.table(), null, contentValue);
-                }
-            } catch (Exception ex) {
-                log(null, methodName, ex, null);
-                return false;
+        try {
+            final ContentValues contentValue = SQModelHelper.getContentValue(object);
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            if (create(object)) {
+                database.insertOrThrow(object.table(), null, contentValue);
             }
-            return true;
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+            return false;
         }
-        return false;
+        return true;
     }
 
     //==============================================================================================
@@ -126,7 +123,7 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> boolean delete(@Nullable final T... objects) {
         final String methodName = "boolean delete(objects)";
         boolean result = true;
-        if (objects != null) {
+        if (validate(objects)) {
             for (final T object : objects) {
                 if (!delete(object)) {
                     result = false;
@@ -145,19 +142,16 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> boolean delete(@Nullable final T object) {
         final String methodName = "boolean delete(object)";
-        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
-        final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
-        final String[] selectionArgs = {String.valueOf(object.id())};
-        if (database != null) {
-            try {
-                database.delete(object.table(), selection, selectionArgs);
-            } catch (Exception ex) {
-                log(null, methodName, ex, null);
-                return false;
-            }
-            return true;
+        try {
+            final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
+            final String[] selectionArgs = {String.valueOf(object.id())};
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            database.delete(object.table(), selection, selectionArgs);
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -187,7 +181,8 @@ public final class SQDatabase extends SQLoggableObject {
         final List<T> result = new ArrayList<>();
         if (ownerClass != null) {
             //Get objects
-            result.addAll(select(ownerClass, tableName, callback, filters));
+            //TODO: 4/14/2017 Comment this for now
+            //result.addAll(select(ownerClass, tableName, callback, filters));
             //Delete objects
             try {
                 final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
@@ -232,20 +227,17 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> boolean update(@Nullable final T object) {
         final String methodName = "boolean update(object)";
-        final ContentValues contentValue = SQModelHelper.getContentValue(object);
-        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
-        final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
-        final String[] selectionArgs = {String.valueOf(object.id())};
-        if ((database != null) && (contentValue != null)) {
-            try {
-                database.update(object.table(), contentValue, selection, selectionArgs);
-            } catch (Exception ex) {
-                log(null, methodName, ex, null);
-                return false;
-            }
-            return true;
+        try {
+            final ContentValues contentValue = SQModelHelper.getContentValue(object);
+            final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
+            final String[] selectionArgs = {String.valueOf(object.id())};
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            database.update(object.table(), contentValue, selection, selectionArgs);
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+            return false;
         }
-        return false;
+        return true;
     }
 
 
@@ -258,7 +250,8 @@ public final class SQDatabase extends SQLoggableObject {
     protected static <T extends SQModel> boolean create(@Nullable final T object) {
         final String methodName = "boolean create(object)";
         try {
-            getDatabase(SQDatabaseType.WRITE).execSQL(SQModelHelper.getCreateQuery(getContext(),
+            SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            database.execSQL(SQModelHelper.getCreateQuery(getContext(),
                     object));
         } catch (Exception ex) {
             log(null, methodName, ex, null);
@@ -282,11 +275,10 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String query,
                                                      @Nullable final SQCursorCallback<T> callback) {
-        final List<T> result = new ArrayList<>();
         if (validate(ownerClass)) {
-            result.addAll(search(ownerClass, ownerClass.getSimpleName(), query, callback));
+            return search(ownerClass, ownerClass.getSimpleName(), query, callback);
         }
-        return result;
+        return new ArrayList<>();
     }
 
     /**
@@ -329,11 +321,10 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
-        List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            result.addAll(search(ownerClass, ownerClass.getSimpleName(), callback, filters));
+            return search(ownerClass, ownerClass.getSimpleName(), callback, filters);
         }
-        return result;
+        return new ArrayList<>();
     }
 
     /**
@@ -363,11 +354,10 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
-        List<T> result = new ArrayList<>();
         if (ownerClass != null) {
-            result.addAll(select(ownerClass, ownerClass.getSimpleName(), callback, filters));
+            return select(ownerClass, ownerClass.getSimpleName(), callback, filters);
         }
-        return result;
+        return new ArrayList<>();
     }
 
     /**
@@ -400,10 +390,10 @@ public final class SQDatabase extends SQLoggableObject {
         final String methodName = "List<Cursor> select(tableName, ownerClass)";
         List<T> result = new ArrayList<>();
         try {
-            final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final String[] projection = SQModelHelper.generateProjection(getContext(), ownerClass);
             final String filter = getFilter(filters);
             final String[] args = getFilterArgs(isSearch, filters);
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final Cursor cursor = database.query(tableName, projection,
                     filter, args, null, null, null);
             cursor.moveToFirst();
@@ -417,6 +407,7 @@ public final class SQDatabase extends SQLoggableObject {
                     }
                 } while (cursor.moveToNext());
             }
+            close(cursor);
         } catch (Exception ex) {
             log(null, methodName, ex, null);
         }
@@ -434,16 +425,17 @@ public final class SQDatabase extends SQLoggableObject {
     protected static <T> String getFilter(@Nullable final SQFilter<T>... filters) {
         final StringBuilder result = new StringBuilder();
         if (validate(filters)) {
-            for (int i = 0; i < filters.length; i++) {
+            int length = filters.length;
+            for (int i = 0; i < length; i++) {
                 final SQFilter filter = filters[i];
                 if (validate(filter)) {
                     final String filterValue = filter.getFilter();
                     final String delimiter = filter.getDelimiterValue();
                     if (validate(filterValue, delimiter)) {
-                        if (i > 0) {
+                        result.append(filterValue);
+                        if (i < (length - 1)) {
                             result.append(delimiter);
                         }
-                        result.append(filterValue);
                     }
                 }
             }
@@ -472,7 +464,8 @@ public final class SQDatabase extends SQLoggableObject {
      * @return filter query
      */
     @NonNull
-    protected static <T> String[] getFilterArgs(boolean isSearch, @Nullable final SQFilter<T>... filters) {
+    protected static <T> String[] getFilterArgs(boolean isSearch,
+                                                @Nullable final SQFilter<T>... filters) {
         List<String> queryList = new ArrayList<>();
         if (validate(filters)) {
             for (final SQFilter filter : filters) {
@@ -510,13 +503,29 @@ public final class SQDatabase extends SQLoggableObject {
      */
     @Nullable
     protected static Context getContext() {
-        final String methodName = "Context getContext()";
+        synchronized (instance) {
+            final String methodName = "Context getContext()";
+            try {
+                return instance.openHelper.getContext();
+            } catch (Exception ex) {
+                log(null, methodName, ex, null);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Method which provide the close {@link SQLiteDatabase}
+     *
+     * @param cursor instance of {@link SQLiteDatabase}
+     */
+    protected static void close(@Nullable final Cursor cursor) {
+        final String methodName = "void close(SQLiteDatabase)";
         try {
-            return instance.openHelper.getContext();
+            cursor.close();
         } catch (Exception ex) {
             log(null, methodName, ex, null);
         }
-        return null;
     }
 
 }
