@@ -105,6 +105,17 @@ public class SQFilter<K extends Object> {
     }
 
     /**
+     * Method which provide the setting of the {@link SQFilterDelimiter} inside the {@link SQFilter}
+     *
+     * @param delimiter instance of {@link SQFilterDelimiter}
+     */
+    public void setDelimiter(@Nullable final SQFilterDelimiter delimiter) {
+        if (!SQValidationHelper.isEmpty(delimiter)) {
+            this.delimiter = delimiter;
+        }
+    }
+
+    /**
      * Method which provide the getting of the filter delimiter
      *
      * @return filter delimiter value
@@ -125,6 +136,17 @@ public class SQFilter<K extends Object> {
             compare = SQFilterCompare.LIKE;
         }
         return compare;
+    }
+
+    /**
+     * Method which provide the setting of the {@link SQFilterCompare} inside the {@link SQFilter}
+     *
+     * @param compare instance of {@link SQFilterCompare}
+     */
+    public void setCompare(@Nullable final SQFilterCompare compare) {
+        if (!SQValidationHelper.isEmpty(compare)) {
+            this.compare = compare;
+        }
     }
 
     /**
