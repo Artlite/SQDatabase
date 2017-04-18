@@ -2,11 +2,13 @@ package com.artlite.sqltest.ui.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
 import com.artlite.adapteredrecyclerview.callbacks.OnAdapteredBaseCallback;
@@ -15,13 +17,17 @@ import com.artlite.adapteredrecyclerview.core.AdapteredView;
 import com.artlite.adapteredrecyclerview.events.RecycleEvent;
 import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
+import com.artlite.sqlib.constants.SQFilterCompare;
+import com.artlite.sqlib.constants.SQFilterDelimiter;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.log.SQLogHelper;
+import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.managers.EventManager;
 import com.artlite.sqltest.managers.ThreadManager;
 import com.artlite.sqltest.models.user.User;
+import com.artlite.sqltest.providers.UserListProvider;
 import com.artlite.sqltest.ui.abs.BaseActivity;
 
 import java.util.ArrayList;
@@ -61,6 +67,10 @@ public class MainActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.menu_item_create_user: {
                 startActivity(CreateUserActivity.class);
+                return true;
+            }
+            case R.id.menu_item_create_user_thread: {
+                createThreadUsers();
                 return true;
             }
             default:
@@ -144,12 +154,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onBackground() {
                 users.addAll(SQDatabase.select(User.class, new SQCursorCallback<User>() {
-                    @Nullable
-                    @Override
-                    public User convert(@NonNull Cursor cursor) {
-                        return new User(cursor);
-                    }
-                }));
+                            @Nullable
+                            @Override
+                            public User convert(@NonNull Cursor cursor) {
+                                return new User(cursor);
+                            }
+                        }));
             }
 
             @Override
@@ -199,6 +209,50 @@ public class MainActivity extends BaseActivity {
         SQDatabase.update(user);
         adapteredView.update(user);
         adapteredView.sort();
+    }
+
+    //==============================================================================================
+    //                                       TESTING
+    //==============================================================================================
+
+    protected void createThreadUsers() {
+        final List<User> users = new UserListProvider().get(this);
+        final Toast toast1 = Toast.makeText(this, "Start task 1", Toast.LENGTH_SHORT);
+        final Toast toast1Finish = Toast.makeText(this, "Finish task 1", Toast.LENGTH_SHORT);
+        final Toast toast2 = Toast.makeText(this, "Start task 2", Toast.LENGTH_SHORT);
+        final Toast toast2Finish = Toast.makeText(this, "Finish task 2", Toast.LENGTH_SHORT);
+        final AsyncTask<Void, Void, Void> task1 = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                toast1.show();
+                SQDatabase.insert(users);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                toast1Finish.show();
+                super.onPostExecute(aVoid);
+            }
+        };
+
+        final AsyncTask<Void, Void, Void> task2 = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                toast2.show();
+                SQDatabase.insert(users);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                toast2Finish.show();
+                super.onPostExecute(aVoid);
+            }
+        };
+
+        task1.execute();
+        task2.execute();
     }
 
 

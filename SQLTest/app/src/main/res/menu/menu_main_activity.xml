@@ -3,9 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_item_create_user"
         android:enabled="true"
         android:icon="@drawable/ic_add_user_white"
         android:title="Create"
-        android:id="@+id/menu_item_create_user"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_item_create_user_thread"
+        android:enabled="true"
+        android:icon="@drawable/ic_create_user_thread"
+        android:title="Create in thread"
         app:showAsAction="always" />
 </menu>

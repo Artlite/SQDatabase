@@ -24,7 +24,9 @@ import com.artlite.sqlib.model.SQModel;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class which provide the init of the instance of the {@link SQDatabase} for creating of the
@@ -43,6 +45,11 @@ public final class SQDatabase extends SQLoggableObject {
      * Database
      */
     private final SQDatabaseOpenHelper openHelper;
+
+    /**
+     * Field which provide the checking if {@link SQLiteDatabase} is open for writing
+     */
+    private AtomicBoolean isOpenWriting = new AtomicBoolean(false);
 
     /**
      * Constructor for the ApplicationDatabaseHelper
@@ -67,39 +74,97 @@ public final class SQDatabase extends SQLoggableObject {
     }
 
     //==============================================================================================
+    //                                      CREATE
+    //==============================================================================================
+
+    /**
+     * Method which provide the init SQL tables for objects
+     *
+     * @param object   instance of {@link Object}
+     * @param database instance of {@link SQLiteDatabase}
+     * @param <T>      class type
+     * @return creation result
+     */
+    protected static <T extends SQModel> boolean create(@Nullable final T object,
+                                                        @Nullable final SQLiteDatabase database) {
+        final String methodName = "boolean create(object)";
+        try {
+            database.execSQL(SQModelHelper.getCreateQuery(getContext(),
+                    object));
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+            return false;
+        }
+        return true;
+    }
+    //==============================================================================================
     //                                      INSERT
     //==============================================================================================
 
     /**
-     * Method which provide the
+     * Method which provide the inserting object into {@link SQDatabase}
      *
-     * @param objects objects
-     * @param <T>     objects type
+     * @param objects {@link List} of the {@link SQModel}
+     * @param <T>     class type
+     * @return inserting result
+     */
+    public static <T extends SQModel> boolean insert(@Nullable final List<T> objects) {
+        if (validate(objects)) {
+            return insert(objects.toArray(new SQModel[0]));
+        }
+        return false;
+    }
+
+    /**
+     * Method which provide the inserting object into {@link SQDatabase}
+     *
+     * @param objects array of the {@link SQModel}
+     * @param <T>     class type
+     * @return inserting result
      */
     public static <T extends SQModel> boolean insert(@Nullable final T... objects) {
         boolean result = true;
         if (validate(objects)) {
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
             for (final T object : objects) {
-                if (!insert(object)) {
+                if (!insert(object, database)) {
                     result = false;
                 }
             }
+            releaseDatabase();
         }
         return result;
     }
 
     /**
-     * Method which provide the
+     * Method which provide the inserting object into {@link SQDatabase}
      *
-     * @param object objects
-     * @param <T>    objects type
+     * @param object instance of {@link SQModel}
+     * @param <T>    class type
+     * @return inserting result
      */
     public static <T extends SQModel> boolean insert(@Nullable final T object) {
         final String methodName = "boolean insert(object)";
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        boolean result = insert(object, database);
+        releaseDatabase();
+        return result;
+    }
+
+    /**
+     * Method which provide the inserting object into {@link SQDatabase}
+     *
+     * @param object   instance of {@link SQModel}
+     * @param database instance of {@link SQLiteDatabase}
+     * @param <T>      class type
+     * @return inserting result
+     */
+    protected static <T extends SQModel> boolean insert(@Nullable final T object,
+                                                        @Nullable final SQLiteDatabase database) {
+        final String methodName = "boolean insert(object)";
         try {
             final ContentValues contentValue = SQModelHelper.getContentValue(object);
-            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
-            if (create(object)) {
+            if (create(object, database)) {
                 database.insertOrThrow(object.table(), null, contentValue);
             }
         } catch (Exception ex) {
@@ -116,19 +181,35 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the delete objects
      *
-     * @param objects objects
-     * @param <T>     object type
-     * @return execution results
+     * @param objects {@link List} of the {@link SQModel}
+     * @param <T>     class type
+     * @return deleting result
+     */
+    public static <T extends SQModel> boolean delete(@Nullable final List<T> objects) {
+        if (validate(objects)) {
+            return delete(objects.toArray(new SQModel[0]));
+        }
+        return false;
+    }
+
+    /**
+     * Method which provide the delete objects
+     *
+     * @param objects array of {@link SQModel}
+     * @param <T>     class type
+     * @return deleting result
      */
     public static <T extends SQModel> boolean delete(@Nullable final T... objects) {
         final String methodName = "boolean delete(objects)";
         boolean result = true;
         if (validate(objects)) {
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
             for (final T object : objects) {
-                if (!delete(object)) {
+                if (!delete(object, database)) {
                     result = false;
                 }
             }
+            releaseDatabase();
         }
         return result;
     }
@@ -136,16 +217,34 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the delete objects
      *
-     * @param object object
-     * @param <T>    object type
-     * @return execution results
+     * @param object instance of {@link SQModel}
+     * @param <T>    class type
+     * @return deleting result
      */
     public static <T extends SQModel> boolean delete(@Nullable final T object) {
+        final String methodName = "boolean delete(object)";
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        boolean result = delete(object, database);
+        releaseDatabase();
+        return result;
+    }
+
+    /**
+     * Method which provide the delete objects
+     *
+     * @param object   instance of {@link SQModel}
+     * @param database instance of {@link SQLiteDatabase}
+     * @param <T>      class type
+     * @return deleting result
+     */
+    public static <T extends SQModel> boolean delete(@Nullable final T object,
+                                                     @Nullable final SQLiteDatabase database) {
         final String methodName = "boolean delete(object)";
         try {
             final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
             final String[] selectionArgs = {String.valueOf(object.id())};
-            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            log(null, methodName, null, "[DB] DELETE " + selection);
+            log(null, methodName, null, "[DB] DELETE ARGS " + Arrays.deepToString(selectionArgs));
             database.delete(object.table(), selection, selectionArgs);
         } catch (Exception ex) {
             log(null, methodName, ex, null);
@@ -154,41 +253,103 @@ public final class SQDatabase extends SQLoggableObject {
         return true;
     }
 
+    //==============================================================================================
+    //                                   DELETE BY FILTER
+    //==============================================================================================
+
     /**
-     * Method which provide the deleting functional
+     * Method which provide the deleting functional by {@link SQFilter}
      *
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param filters    {@link List} of the {@link SQFilter}
+     * @param <T>        class type
+     * @return deleting result
      */
-    public static <T extends SQModel> List<T> delete(@Nullable final Class ownerClass,
-                                                     @Nullable final SQCursorCallback<T> callback,
-                                                     @Nullable final SQFilter... filters) {
-        return delete(ownerClass, ownerClass.getSimpleName(), callback, filters);
+    public static <T extends SQModel> int delete(@Nullable final Class ownerClass,
+                                                 @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return delete(ownerClass, filters.toArray(new SQFilter[0]));
+        }
+        return delete(ownerClass);
     }
 
     /**
-     * Method which provide the deleting functional
+     * Method which provide the deleting functional by {@link SQFilter}
      *
-     * @param tableName  table name
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return deleting result
      */
-    public static <T extends SQModel> List<T> delete(@Nullable final Class ownerClass,
-                                                     @Nullable final String tableName,
-                                                     @Nullable final SQCursorCallback<T> callback,
-                                                     @Nullable final SQFilter... filters) {
+    public static <T extends SQModel> int delete(@Nullable final Class ownerClass,
+                                                 @Nullable final SQFilter... filters) {
+        if (validate(ownerClass)) {
+            return delete(ownerClass, ownerClass.getSimpleName(), filters);
+        }
+        return 0;
+    }
+
+    /**
+     * Method which provide the deleting functional by {@link SQFilter}
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param filters    {@link List} of the {@link SQFilter}
+     * @param <T>        class type
+     * @return deleting result
+     */
+    public static <T extends SQModel> int delete(@Nullable final Class ownerClass,
+                                                 @Nullable final String tableName,
+                                                 @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return delete(ownerClass, tableName, filters.toArray(new SQFilter[0]));
+        }
+        return delete(ownerClass, tableName);
+    }
+
+    /**
+     * Method which provide the deleting functional by {@link SQFilter}
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return deleting result
+     */
+    public static <T extends SQModel> int delete(@Nullable final Class ownerClass,
+                                                 @Nullable final String tableName,
+                                                 @Nullable final SQFilter... filters) {
         final String methodName = "List<Cursor> delete(ownerClass, tableName, callback, filters)";
-        final List<T> result = new ArrayList<>();
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        int result = delete(ownerClass, tableName, database, filters);
+        releaseDatabase();
+        return result;
+    }
+
+    /**
+     * Method which provide the deleting functional by {@link SQFilter}
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param database   instance of {@link SQLiteDatabase}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return deleting result
+     */
+    protected static <T extends SQModel> int delete(@Nullable final Class ownerClass,
+                                                    @Nullable final String tableName,
+                                                    @Nullable final SQLiteDatabase database,
+                                                    @Nullable final SQFilter... filters) {
+        final String methodName = "List<Cursor> delete(ownerClass, tableName, callback, filters)";
+        int result = 0;
         if (ownerClass != null) {
-            //Get objects
-            //TODO: 4/14/2017 Comment this for now
-            //result.addAll(select(ownerClass, tableName, callback, filters));
             //Delete objects
             try {
-                final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
                 final String filter = getFilter(filters);
                 final String[] args = getFilterArgs(filters);
-                database.delete(tableName, filter, args);
+                log(null, methodName, null, "[DB] DELETE " + filter);
+                log(null, methodName, null, "[DB] DELETE ARGS " + Arrays.deepToString(args));
+                result = database.delete(tableName, filter, args);
             } catch (Exception ex) {
                 log(null, methodName, ex, null);
             }
@@ -203,56 +364,71 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the update of the {@link SQModel} objects list
      *
-     * @param objects list of {@link SQModel}
-     * @param <T>     objects type
-     * @return update result
+     * @param objects {@link List} of the {@link SQModel}
+     * @param <T>     class type
+     * @return updating result
+     */
+    public static <T extends SQModel> boolean update(@Nullable final List<T> objects) {
+        if (validate(objects)) {
+            return update(objects.toArray(new SQModel[0]));
+        }
+        return false;
+    }
+
+    /**
+     * Method which provide the update of the {@link SQModel} objects list
+     *
+     * @param objects array of {@link SQModel}
+     * @param <T>     class type
+     * @return updating result
      */
     public static <T extends SQModel> boolean update(@Nullable final T... objects) {
         boolean result = true;
         if (validate(objects)) {
+            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
             for (final T object : objects) {
-                if (!update(object)) {
+                if (!update(object, database)) {
                     result = false;
                 }
             }
+            releaseDatabase();
         }
         return result;
     }
 
     /**
-     * Method which provide the
+     * Method which provide the update of the {@link SQModel} objects list
      *
-     * @param object objects
-     * @param <T>    objects type
+     * @param object instance of {@link SQModel}
+     * @param <T>    class type
+     * @return updating result
      */
     public static <T extends SQModel> boolean update(@Nullable final T object) {
+        final String methodName = "boolean update(object)";
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        boolean result = update(object, database);
+        releaseDatabase();
+        return result;
+    }
+
+    /**
+     * Method which provide the update of the {@link SQModel} objects list
+     *
+     * @param object   instance of {@link SQModel}
+     * @param database instance of {@link SQLiteDatabase}
+     * @param <T>      class type
+     * @return updating result
+     */
+    public static <T extends SQModel> boolean update(@Nullable final T object,
+                                                     @Nullable final SQLiteDatabase database) {
         final String methodName = "boolean update(object)";
         try {
             final ContentValues contentValue = SQModelHelper.getContentValue(object);
             final String selection = String.format("%s %s", BaseColumns._ID, " LIKE ?");
             final String[] selectionArgs = {String.valueOf(object.id())};
-            final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+            log(null, methodName, null, "[DB] UPDATE " + selection);
+            log(null, methodName, null, "[DB] UPDATE ARGS " + Arrays.deepToString(selectionArgs));
             database.update(object.table(), contentValue, selection, selectionArgs);
-        } catch (Exception ex) {
-            log(null, methodName, ex, null);
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Method which provide the init SQL tables for objects
-     *
-     * @param object objects
-     * @param <T>    objects type
-     */
-    protected static <T extends SQModel> boolean create(@Nullable final T object) {
-        final String methodName = "boolean create(object)";
-        try {
-            SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
-            database.execSQL(SQModelHelper.getCreateQuery(getContext(),
-                    object));
         } catch (Exception ex) {
             log(null, methodName, ex, null);
             return false;
@@ -267,10 +443,11 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the searching functional
      *
-     * @param ownerClass owner class
+     * @param ownerClass instance of {@link Class}
      * @param query      search query
      * @param callback   instance of {@link SQCursorCallback}
-     * @return list of {@link Cursor}
+     * @param <T>        class type
+     * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String query,
@@ -284,10 +461,12 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the searching functional
      *
-     * @param ownerClass owner class
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
      * @param query      search query
-     * @param callback   instance of {@link SQCursorCallback}
-     * @return list of {@link Cursor}
+     * @param callback   instance {@link SQCursorCallback}
+     * @param <T>        class type
+     * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
@@ -315,8 +494,11 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the searching functional
      *
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param callback   instance of the {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final SQCursorCallback<T> callback,
@@ -330,9 +512,12 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the searching functional
      *
-     * @param tableName  table name
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
@@ -348,8 +533,11 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the select all functional
      *
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final SQCursorCallback<T> callback,
@@ -363,9 +551,12 @@ public final class SQDatabase extends SQLoggableObject {
     /**
      * Method which provide the select all functional
      *
-     * @param tableName  table name
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
@@ -378,9 +569,12 @@ public final class SQDatabase extends SQLoggableObject {
      * Method which provide the select all functional
      *
      * @param isSearch   if it search
-     * @param tableName  table name
-     * @param ownerClass owner class
-     * @return list of {@link Cursor}
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of the {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
      */
     protected static <T extends SQModel> List<T> select(boolean isSearch,
                                                         @Nullable final Class ownerClass,
@@ -393,6 +587,8 @@ public final class SQDatabase extends SQLoggableObject {
             final String[] projection = SQModelHelper.generateProjection(getContext(), ownerClass);
             final String filter = getFilter(filters);
             final String[] args = getFilterArgs(isSearch, filters);
+            log(null, methodName, null, "[DB] SELECT " + filter);
+            log(null, methodName, null, "[DB] SELECT ARGS " + Arrays.deepToString(args));
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final Cursor cursor = database.query(tableName, projection,
                     filter, args, null, null, null);
@@ -431,9 +627,12 @@ public final class SQDatabase extends SQLoggableObject {
                 if (validate(filter)) {
                     final String filterValue = filter.getFilter();
                     final String delimiter = filter.getDelimiterValue();
-                    if (validate(filterValue, delimiter)) {
+                    final SQFilterDelimiter type = filter.getDelimiter();
+                    if (validate(filterValue, delimiter, type)) {
+                        boolean isNotLast = i < (length - 1);
                         result.append(filterValue);
-                        if (i < (length - 1)) {
+                        if ((isNotLast) ||
+                                ((!isNotLast) && (type == SQFilterDelimiter.RIGHT_GROUP))) {
                             result.append(delimiter);
                         }
                     }
@@ -488,12 +687,16 @@ public final class SQDatabase extends SQLoggableObject {
      */
     @Nullable
     protected static SQLiteDatabase getDatabase(@Nullable final SQDatabaseType type) {
-        synchronized (instance) {
-            if ((instance != null) && (instance.openHelper != null)) {
+        if ((instance != null) && (instance.openHelper != null)) {
+            instance.checkLock();
+            synchronized (instance) {
+                if (type == SQDatabaseType.WRITE) {
+                    lockDatabase();
+                }
                 return instance.openHelper.getDatabase(type);
             }
-            return null;
         }
+        return null;
     }
 
     /**
@@ -514,6 +717,10 @@ public final class SQDatabase extends SQLoggableObject {
         }
     }
 
+    //==============================================================================================
+    //                               CURSOR METHODS
+    //==============================================================================================
+
     /**
      * Method which provide the close {@link SQLiteDatabase}
      *
@@ -525,6 +732,50 @@ public final class SQDatabase extends SQLoggableObject {
             cursor.close();
         } catch (Exception ex) {
             log(null, methodName, ex, null);
+        }
+    }
+
+    //==============================================================================================
+    //                              LOCK/UNLOCK DATABASE
+    //==============================================================================================
+
+    /**
+     * Method which provide the releasing of the {@link SQLiteDatabase}
+     */
+    protected synchronized static void releaseDatabase() {
+        final String methodName = "void releaseDatabase()";
+        if (instance != null) {
+            instance.isOpenWriting = new AtomicBoolean(false);
+            log(null, methodName, null, "[DB]: Database released");
+        }
+    }
+
+    /**
+     * Method which provide the locking of the {@link SQLiteDatabase}
+     */
+    protected synchronized static void lockDatabase() {
+        final String methodName = "void lockDatabase()";
+        if (instance != null) {
+            instance.isOpenWriting = new AtomicBoolean(true);
+            log(null, methodName, null, "[DB]: Database locked");
+        }
+    }
+
+    /**
+     * Method which provide the check locking of the {@link SQLiteDatabase}
+     */
+    protected static void checkLock() {
+        final String methodName = " void checkLock()";
+        if (instance != null) {
+            while (instance.isOpenWriting.equals(true)) {
+                try {
+                    log(null, methodName, null, "[DB]: Database is locking");
+                    Thread.sleep(200);
+                } catch (Exception ex) {
+                    log(null, methodName, ex, null);
+                    return;
+                }
+            }
         }
     }
 

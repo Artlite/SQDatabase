@@ -8,7 +8,13 @@ import android.support.annotation.NonNull;
 
 public enum SQFilterDelimiter {
     AND(" AND "),
-    OR(" OR ");
+    OR(" OR "),
+    AND_LEFT_GROUP(" AND ( "),
+    AND_RIGHT_GROUP(" ) AND "),
+    OR_LEFT_GROUP(" OR ( "),
+    OR_RIGHT_GROUP(" ) OR "),
+    RIGHT_GROUP(" ) "),
+    LEFT_GROUP(" ( ");
     private String value;
 
     /**
