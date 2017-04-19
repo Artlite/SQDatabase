@@ -502,11 +502,50 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return search(ownerClass, callback, filters.toArray(new SQFilter[0]));
+        }
+        return search(ownerClass, callback);
+
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param callback   instance of the {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return searching result
+     */
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
+                                                     @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
         if (ownerClass != null) {
             return search(ownerClass, ownerClass.getSimpleName(), callback, filters);
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * Method which provide the searching functional
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return searching result
+     */
+    public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
+                                                     @Nullable final String tableName,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return search(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+        }
+        return search(ownerClass, tableName, callback);
     }
 
     /**
@@ -529,6 +568,24 @@ public final class SQDatabase extends SQLoggableObject {
     //==============================================================================================
     //                                      SELECT
     //==============================================================================================
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    {@link List} of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
+     */
+    public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
+                                                     @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return select(ownerClass, callback, filters.toArray(new SQFilter[0]));
+        }
+        return select(ownerClass, callback);
+    }
 
     /**
      * Method which provide the select all functional
@@ -561,8 +618,51 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
                                                      @Nullable final SQCursorCallback<T> callback,
+                                                     @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return select(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+        }
+        return select(ownerClass, tableName, callback);
+    }
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
+     */
+    public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
+                                                     @Nullable final String tableName,
+                                                     @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
         return select(false, ownerClass, tableName, callback, filters);
+    }
+
+    /**
+     * Method which provide the select all functional
+     *
+     * @param isSearch   if it search
+     * @param ownerClass instance of {@link Class}
+     * @param tableName  {@link String} value of table name
+     * @param callback   instance of the {@link SQCursorCallback}
+     * @param filters    array of the {@link SQFilter}
+     * @param <T>        class type
+     * @return selecting result
+     */
+    protected static <T extends SQModel> List<T> select(boolean isSearch,
+                                                        @Nullable final Class ownerClass,
+                                                        @Nullable final String tableName,
+                                                        @Nullable final SQCursorCallback<T> callback,
+                                                        @Nullable final List<SQFilter> filters) {
+        if (validate(filters)) {
+            return select(isSearch, ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+
+        }
+        return select(isSearch, ownerClass, tableName, callback);
     }
 
     /**
