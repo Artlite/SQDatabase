@@ -17,11 +17,8 @@ import com.artlite.adapteredrecyclerview.core.AdapteredView;
 import com.artlite.adapteredrecyclerview.events.RecycleEvent;
 import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
-import com.artlite.sqlib.constants.SQFilterCompare;
-import com.artlite.sqlib.constants.SQFilterDelimiter;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.log.SQLogHelper;
-import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqltest.R;
 import com.artlite.sqltest.constants.EventCodes;
 import com.artlite.sqltest.managers.EventManager;
@@ -71,6 +68,10 @@ public class MainActivity extends BaseActivity {
             }
             case R.id.menu_item_create_user_thread: {
                 createThreadUsers();
+                return true;
+            }
+            case R.id.menu_item_clear_users: {
+                SQDatabase.clear(User.class.getSimpleName());
                 return true;
             }
             default:
@@ -154,12 +155,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onBackground() {
                 users.addAll(SQDatabase.select(User.class, new SQCursorCallback<User>() {
-                            @Nullable
-                            @Override
-                            public User convert(@NonNull Cursor cursor) {
-                                return new User(cursor);
-                            }
-                        }));
+                    @Nullable
+                    @Override
+                    public User convert(@NonNull Cursor cursor) {
+                        return new User(cursor);
+                    }
+                }));
             }
 
             @Override

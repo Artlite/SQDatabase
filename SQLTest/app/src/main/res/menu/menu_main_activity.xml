@@ -15,4 +15,10 @@
         android:icon="@drawable/ic_create_user_thread"
         android:title="Create in thread"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_item_clear_users"
+        android:enabled="true"
+        android:title="Drop database"
+        app:showAsAction="ifRoom" />
 </menu>
