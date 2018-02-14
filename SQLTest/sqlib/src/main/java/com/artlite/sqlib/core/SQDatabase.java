@@ -17,6 +17,7 @@ import com.artlite.sqlib.constants.SQType;
 import com.artlite.sqlib.helpers.annotation.SQAnnotationHelper;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
 import com.artlite.sqlib.helpers.validation.SQValidationHelper;
+import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqlib.model.SQModel;
@@ -354,6 +355,34 @@ public final class SQDatabase extends SQLoggableObject {
                 log(null, methodName, ex, null);
             }
         }
+        return result;
+    }
+
+    //==============================================================================================
+    //                                      CLEAR DATABASE
+    //==============================================================================================
+
+    /**
+     * Method which provide the clearing of the table name
+     *
+     * @param tableName {@link String} value of the table name
+     * @return {@link Boolean} value of the result
+     */
+    public static boolean clear(@Nullable final String tableName) {
+        boolean result = true;
+        final String methodName = "clear(tableName)";
+        final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
+        try {
+            database.execSQL("drop table \'" + tableName + "\'");
+        } catch (Exception ex) {
+            result = false;
+            try {
+                SQLogHelper.log(instance, methodName,
+                        ex, "Can'\'t drop database: " + tableName);
+            } catch (Exception ex1) {
+            }
+        }
+        releaseDatabase();
         return result;
     }
 
