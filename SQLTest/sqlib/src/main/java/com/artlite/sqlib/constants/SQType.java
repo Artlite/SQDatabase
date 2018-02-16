@@ -22,6 +22,7 @@ public enum SQType {
     DOUBLE("DOUBLE"),
     INTEGER("INTEGER"),
     VARCHAR("VARCHAR"),
+    LONG("LONG"),
     STRING("VARCHAR");
     /**
      * Type name
@@ -64,6 +65,8 @@ public enum SQType {
                 return INTEGER;
             } else if (type.getSimpleName().equalsIgnoreCase("boolean")) {
                 return BOOLEAN;
+            } else if (type.getSimpleName().equalsIgnoreCase("long")) {
+                return LONG;
             } else if (type == String.class) {
                 return STRING;
             } else if (type == Float.class) {
@@ -74,6 +77,8 @@ public enum SQType {
                 return BOOLEAN;
             } else if (type == Integer.class) {
                 return INTEGER;
+            } else if (type == Long.class) {
+                return LONG;
             } else if (type == Date.class) {
                 return DATE;
             } else {

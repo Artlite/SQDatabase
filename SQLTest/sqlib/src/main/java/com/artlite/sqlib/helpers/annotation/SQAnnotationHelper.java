@@ -149,6 +149,8 @@ public final class SQAnnotationHelper extends SQBaseHelper {
                     object = new Double(field.getDouble(owner));
                 } else if ((type == Float.class) && isFloat(owner, field)) {
                     object = new Float(field.getFloat(owner));
+                } else if ((type == Long.class) && isLong(owner, field)) {
+                    object = new Long(field.getLong(owner));
                 }
             } catch (Exception e) {
                 SQLogHelper.log(null, methodName, e, null);
@@ -197,6 +199,25 @@ public final class SQAnnotationHelper extends SQBaseHelper {
         final String methodName = "boolean isFloat(owner, field)";
         try {
             field.getFloat(owner);
+            return true;
+        } catch (Exception ex) {
+            SQLogHelper.log(null, methodName, ex, null);
+        }
+        return false;
+    }
+
+    /**
+     * Method which provide the checking if field is double
+     *
+     * @param owner owner
+     * @param field field
+     * @return checking valud
+     */
+    protected static boolean isLong(@Nullable final Object owner,
+                                    @Nullable final Field field) {
+        final String methodName = "boolean isFloat(owner, field)";
+        try {
+            field.getLong(owner);
             return true;
         } catch (Exception ex) {
             SQLogHelper.log(null, methodName, ex, null);

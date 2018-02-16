@@ -164,6 +164,25 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
     }
 
     /**
+     * Method which provide the getting {@link Boolean} from {@link Cursor}
+     *
+     * @param cursor    instance of {@link Cursor}
+     * @param fieldName field name from cursor
+     * @return value of {@link Boolean}
+     */
+    public static long getLong(@Nullable final Cursor cursor,
+                               @Nullable final String fieldName) {
+        final String methodName = "long getLong(cursor, fieldName)";
+        long result = 0;
+        try {
+            result = cursor.getLong(cursor.getColumnIndexOrThrow(fieldName));
+        } catch (Exception ex) {
+            log(null, methodName, ex, null);
+        }
+        return result;
+    }
+
+    /**
      * Method which provide the getting {@link Parcelable} object from {@link Cursor}
      *
      * @param cursor    instance of {@link Cursor}
