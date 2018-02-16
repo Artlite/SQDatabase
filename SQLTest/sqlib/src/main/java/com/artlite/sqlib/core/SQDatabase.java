@@ -21,6 +21,7 @@ import com.artlite.sqlib.log.SQLogHelper;
 import com.artlite.sqlib.log.SQLoggableObject;
 import com.artlite.sqlib.model.SQFilter;
 import com.artlite.sqlib.model.SQModel;
+import com.artlite.sqlib.model.SQSortOrder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -474,15 +475,17 @@ public final class SQDatabase extends SQLoggableObject {
      *
      * @param ownerClass instance of {@link Class}
      * @param query      search query
+     * @param sortOrder  instance of the {@link SQSortOrder}
      * @param callback   instance of {@link SQCursorCallback}
      * @param <T>        class type
      * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String query,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback) {
         if (validate(ownerClass)) {
-            return search(ownerClass, ownerClass.getSimpleName(), query, callback);
+            return search(ownerClass, ownerClass.getSimpleName(), query, sortOrder, callback);
         }
         return new ArrayList<>();
     }
@@ -500,6 +503,7 @@ public final class SQDatabase extends SQLoggableObject {
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
                                                      @Nullable final String query,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback) {
         final List<SQFilter<String>> filters = new ArrayList<>();
         if (SQValidationHelper.emptyValidate(ownerClass, query)) {
@@ -517,7 +521,7 @@ public final class SQDatabase extends SQLoggableObject {
                 }
             }, SQField.class);
         }
-        return search(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+        return search(ownerClass, tableName, sortOrder, callback, filters.toArray(new SQFilter[0]));
     }
 
     /**
@@ -530,12 +534,13 @@ public final class SQDatabase extends SQLoggableObject {
      * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final List<SQFilter> filters) {
         if (validate(filters)) {
-            return search(ownerClass, callback, filters.toArray(new SQFilter[0]));
+            return search(ownerClass, sortOrder, callback, filters.toArray(new SQFilter[0]));
         }
-        return search(ownerClass, callback);
+        return search(ownerClass, sortOrder, callback);
 
     }
 
@@ -549,10 +554,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @return searching result
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
         if (ownerClass != null) {
-            return search(ownerClass, ownerClass.getSimpleName(), callback, filters);
+            return search(ownerClass, ownerClass.getSimpleName(), sortOrder, callback, filters);
         }
         return new ArrayList<>();
     }
@@ -569,12 +575,13 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final List<SQFilter> filters) {
         if (validate(filters)) {
-            return search(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+            return search(ownerClass, tableName, sortOrder, callback, filters.toArray(new SQFilter[0]));
         }
-        return search(ownerClass, tableName, callback);
+        return search(ownerClass, tableName, sortOrder, callback);
     }
 
     /**
@@ -589,9 +596,10 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> List<T> search(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
-        return select(true, ownerClass, tableName, callback, filters);
+        return select(true, ownerClass, tableName, sortOrder, callback, filters);
     }
 
     //==============================================================================================
@@ -608,12 +616,13 @@ public final class SQDatabase extends SQLoggableObject {
      * @return selecting result
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final List<SQFilter> filters) {
         if (validate(filters)) {
-            return select(ownerClass, callback, filters.toArray(new SQFilter[0]));
+            return select(ownerClass, sortOrder, callback, filters.toArray(new SQFilter[0]));
         }
-        return select(ownerClass, callback);
+        return select(ownerClass, sortOrder, callback);
     }
 
     /**
@@ -626,10 +635,11 @@ public final class SQDatabase extends SQLoggableObject {
      * @return selecting result
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
         if (ownerClass != null) {
-            return select(ownerClass, ownerClass.getSimpleName(), callback, filters);
+            return select(ownerClass, ownerClass.getSimpleName(), sortOrder, callback, filters);
         }
         return new ArrayList<>();
     }
@@ -646,12 +656,13 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final List<SQFilter> filters) {
         if (validate(filters)) {
-            return select(ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+            return select(ownerClass, tableName, sortOrder, callback, filters.toArray(new SQFilter[0]));
         }
-        return select(ownerClass, tableName, callback);
+        return select(ownerClass, tableName, sortOrder, callback);
     }
 
     /**
@@ -666,9 +677,10 @@ public final class SQDatabase extends SQLoggableObject {
      */
     public static <T extends SQModel> List<T> select(@Nullable final Class ownerClass,
                                                      @Nullable final String tableName,
+                                                     @Nullable SQSortOrder sortOrder,
                                                      @Nullable final SQCursorCallback<T> callback,
                                                      @Nullable final SQFilter... filters) {
-        return select(false, ownerClass, tableName, callback, filters);
+        return select(false, ownerClass, tableName, sortOrder, callback, filters);
     }
 
     /**
@@ -685,13 +697,14 @@ public final class SQDatabase extends SQLoggableObject {
     protected static <T extends SQModel> List<T> select(boolean isSearch,
                                                         @Nullable final Class ownerClass,
                                                         @Nullable final String tableName,
+                                                        @Nullable SQSortOrder sortOrder,
                                                         @Nullable final SQCursorCallback<T> callback,
                                                         @Nullable final List<SQFilter> filters) {
         if (validate(filters)) {
-            return select(isSearch, ownerClass, tableName, callback, filters.toArray(new SQFilter[0]));
+            return select(isSearch, ownerClass, tableName, sortOrder, callback, filters.toArray(new SQFilter[0]));
 
         }
-        return select(isSearch, ownerClass, tableName, callback);
+        return select(isSearch, ownerClass, tableName, sortOrder, callback);
     }
 
     /**
@@ -708,6 +721,7 @@ public final class SQDatabase extends SQLoggableObject {
     protected static <T extends SQModel> List<T> select(boolean isSearch,
                                                         @Nullable final Class ownerClass,
                                                         @Nullable final String tableName,
+                                                        @Nullable SQSortOrder sortOrder,
                                                         @Nullable final SQCursorCallback<T> callback,
                                                         @Nullable final SQFilter... filters) {
         final String methodName = "List<Cursor> select(tableName, ownerClass)";
@@ -715,12 +729,16 @@ public final class SQDatabase extends SQLoggableObject {
         try {
             final String[] projection = SQModelHelper.generateProjection(getContext(), ownerClass);
             final String filter = getFilter(filters);
+            String sortQuery = null;
+            if (sortOrder != null) {
+                sortQuery = sortOrder.getSortQuery();
+            }
             final String[] args = getFilterArgs(isSearch, filters);
             log(null, methodName, null, "[DB] SELECT " + filter);
             log(null, methodName, null, "[DB] SELECT ARGS " + Arrays.deepToString(args));
             final SQLiteDatabase database = getDatabase(SQDatabaseType.READ);
             final Cursor cursor = database.query(tableName, projection,
-                    filter, args, null, null, null);
+                    filter, args, null, null, sortQuery);
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
                 do {

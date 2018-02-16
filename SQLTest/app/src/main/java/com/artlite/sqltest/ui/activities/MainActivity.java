@@ -154,7 +154,7 @@ public class MainActivity extends BaseActivity {
         ThreadManager.execute(new ThreadManager.OnExecutionCallback() {
             @Override
             public void onBackground() {
-                users.addAll(SQDatabase.select(User.class, new SQCursorCallback<User>() {
+                users.addAll(SQDatabase.select(User.class, null, new SQCursorCallback<User>() {
                     @Nullable
                     @Override
                     public User convert(@NonNull Cursor cursor) {
