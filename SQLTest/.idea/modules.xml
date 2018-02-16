@@ -3,11 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SQLTest.iml" filepath="$PROJECT_DIR$/SQLTest.iml" />
-      <module fileurl="file://C:\Development\Android\SQDatabase\SQLTest\SQLTest.iml" filepath="C:\Development\Android\SQDatabase\SQLTest\SQLTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Development\Android\SQDatabase\SQLTest\app\app.iml" filepath="C:\Development\Android\SQDatabase\SQLTest\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/sqlib/sqlib.iml" filepath="$PROJECT_DIR$/sqlib/sqlib.iml" />
-      <module fileurl="file://C:\Development\Android\SQDatabase\SQLTest\sqlib\sqlib.iml" filepath="C:\Development\Android\SQDatabase\SQLTest\sqlib\sqlib.iml" />
     </modules>
   </component>
 </project>

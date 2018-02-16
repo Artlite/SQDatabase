@@ -73,11 +73,11 @@ abstract class SQModelHelper_Cursor extends SQModelHelper_Projection {
      * @param fieldName field name from cursor
      * @return value of {@link Date}
      */
-    @NonNull
+    @Nullable
     public static Date getDate(@Nullable final Cursor cursor,
                                @Nullable final String fieldName) {
         final String methodName = "String getDate(cursor, fieldName)";
-        Date date = new Date();
+        Date date = null;
         try {
             final String dateString = cursor.getString(cursor.getColumnIndexOrThrow(fieldName));
             date = convert(dateString);
