@@ -369,11 +369,14 @@ public final class SQDatabase extends SQLoggableObject {
      * @param tableName {@link String} value of the table name
      * @return {@link Boolean} value of the result
      */
-    public static boolean clear(@Nullable final String tableName) {
+    public static boolean clear(@Nullable final String tableName,
+                                @Nullable Class tableClass) {
         boolean result = true;
         final String methodName = "clear(tableName)";
         final SQLiteDatabase database = getDatabase(SQDatabaseType.WRITE);
         try {
+            SQModelHelper.clearCreateQuery(getContext(), tableName);
+            SQModelHelper.clearProjection(getContext(), tableClass);
             database.execSQL("drop table \'" + tableName + "\'");
         } catch (Exception ex) {
             result = false;

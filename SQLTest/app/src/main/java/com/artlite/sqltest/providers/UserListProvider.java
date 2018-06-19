@@ -29,7 +29,9 @@ public final class UserListProvider implements BaseProvider<List<User>, Context>
                     final String name = SQRandomHelper.generateSentence(context, 1);
                     final String surname = SQRandomHelper.generateSentence(context, 1);
                     final String about = SQRandomHelper.generateSentence(context, 10);
-                    users.add(new User(name, surname, about, null));
+                    final User user = new User(name, surname, about, null);
+                    user.setSursurname(SQRandomHelper.generateSentence(context, 10));
+                    users.add(user);
                 }
             }
         }

@@ -22,6 +22,7 @@ import java.util.List;
  */
 
 abstract class SQModelHelper_Projection extends SQModelHelper_Convert {
+
     /**
      * Method which provide the getting of the projection from the {@link SQModel} object
      *
@@ -56,4 +57,23 @@ abstract class SQModelHelper_Projection extends SQModelHelper_Convert {
         }
         return projection.toArray(new String[projection.size()]);
     }
+
+    /**
+     * Method which provide the getting of the projection from the {@link SQModel} object
+     *
+     * @param context     instance of {@link Context}
+     * @param objectClass instance of {@link SQModel} class
+     * @return generated projection
+     */
+    public static void clearProjection(@Nullable final Context context,
+                                       @Nullable final Class objectClass) {
+        final List<String> projection = new ArrayList<>();
+        //Validation
+        if (validate(context, objectClass)) {
+            //SharedPreferences
+            final String className = String.format("%s_projection", objectClass.getName());
+            SQPreferenceHelper.delete(context, className);
+        }
+    }
+
 }

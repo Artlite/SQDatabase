@@ -99,6 +99,22 @@ public final class SQModelHelper extends SQModelHelper_Cursor {
     }
 
     /**
+     * Method which provide the clearing of the created query
+     *
+     * @return {@link Boolean} value if it created
+     */
+    public static boolean clearCreateQuery(@Nullable final Context context,
+                                           @Nullable final String tableName) {
+        try {
+            final String tableNamePreferences = String.format("%s_create_fields", tableName);
+            SQPreferenceHelper.delete(context, tableNamePreferences);
+        } catch (Exception ex) {
+
+        }
+        return false;
+    }
+
+    /**
      * Method which provide the getting of the list of the {@link ContentValues}
      *
      * @param objects list of {@link SQModel}

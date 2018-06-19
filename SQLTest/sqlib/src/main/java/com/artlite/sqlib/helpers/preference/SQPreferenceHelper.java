@@ -99,6 +99,28 @@ public final class SQPreferenceHelper extends SQBaseHelper {
     }
 
     /**
+     * Method which provide the saving of the {@link List} value to the SharedPreferences
+     *
+     * @param context current context
+     * @param id      SharedPreferences key
+     */
+    public static boolean delete(@Nullable final Context context,
+                                 @Nullable final String id) {
+        final String methodName = "boolean save(context, object, id)";
+        if (validate(context, id)) {
+            try {
+                SharedPreferences.Editor editor = getEditor(context);
+                editor.remove(id);
+                editor.commit();
+                return true;
+            } catch (Exception ex) {
+                log(null, methodName, ex, null);
+            }
+        }
+        return false;
+    }
+
+    /**
      * Method which provide the saving of the {@link Date} value to the SharedPreferences
      *
      * @param context current context

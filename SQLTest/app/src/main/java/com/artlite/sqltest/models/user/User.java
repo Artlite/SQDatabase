@@ -39,6 +39,8 @@ public class User extends User_View {
     @SQField
     private String surname;
     @SQField
+    private String sursurname;
+    @SQField
     private String aboutMe;
     @SQField
     private Date creation = new Date();
@@ -144,6 +146,7 @@ public class User extends User_View {
         this.id = SQModelHelper.getID(cursor);
         this.name = SQModelHelper.getString(cursor, "name");
         this.surname = SQModelHelper.getString(cursor, "surname");
+        this.sursurname = SQModelHelper.getString(cursor, "sursurname");
         this.aboutMe = SQModelHelper.getString(cursor, "aboutMe");
         this.creation = SQModelHelper.getDate(cursor, "creation");
         this.address = SQModelHelper.getObject(cursor, Address.CREATOR, "address");
@@ -295,6 +298,10 @@ public class User extends User_View {
      */
     public void setAvatar(Bitmap avatar) {
         this.avatar = new SQBitmap(avatar, K_MAX_WIDTH, K_MAX_HEIGHT);
+    }
+
+    public void setSursurname(String sursurname) {
+        this.sursurname = sursurname;
     }
 
     /**

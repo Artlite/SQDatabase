@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
             case R.id.menu_item_clear_users: {
-                SQDatabase.clear(User.class.getSimpleName());
+                SQDatabase.clear(User.class.getSimpleName(), User.class);
                 return true;
             }
             default:
