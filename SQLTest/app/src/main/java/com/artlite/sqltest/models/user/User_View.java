@@ -7,11 +7,9 @@ import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
-import com.artlite.adapteredrecyclerview.events.RecycleEvent;
-import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
-import com.artlite.adapteredrecyclerview.models.BaseObject;
-import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
+import com.artlite.adapteredrecyclerview.events.AREvent;
+import com.artlite.adapteredrecyclerview.models.ARCell;
+import com.artlite.adapteredrecyclerview.models.ARObject;
 import com.artlite.sqlib.model.SQModel;
 import com.artlite.sqltest.R;
 
@@ -19,11 +17,11 @@ import com.artlite.sqltest.R;
  * Created by dlernatovich on 2/15/2017.
  */
 
-abstract class User_View extends BaseObject implements SQModel, Parcelable {
+abstract class User_View extends ARObject implements SQModel, Parcelable {
 
     protected static final String K_TABLE_NAME = User.class.getSimpleName();
-    public static final RecycleEvent K_DELETE_USER = new RecycleEvent(100);
-    public static final RecycleEvent K_ADD_TO_FAVORITE = new RecycleEvent(101);
+    public static final AREvent K_DELETE_USER = new AREvent(100);
+    public static final AREvent K_ADD_TO_FAVORITE = new AREvent(101);
     protected static final int K_MAX_WIDTH = 150;
     protected static final int K_MAX_HEIGHT = 150;
 
@@ -34,19 +32,19 @@ abstract class User_View extends BaseObject implements SQModel, Parcelable {
     /**
      * Class which provide the visualization of the {@link User}
      */
-    protected static class ObjectView extends BaseRecyclerItem<User> {
+    protected static class ObjectView extends ARCell<User> {
 
-        @FindViewBy(id = R.id.label_name)
+        //        @FindViewBy(id = R.id.label_name)
         private AppCompatTextView labelName;
-        @FindViewBy(id = R.id.label_about_me)
+        //        @FindViewBy(id = R.id.label_about_me)
         private AppCompatTextView labelAboutMe;
-        @FindViewBy(id = R.id.image_delete)
+        //        @FindViewBy(id = R.id.image_delete)
         private ImageView imageDelete;
-        @FindViewBy(id = R.id.layout_image)
+        //        @FindViewBy(id = R.id.layout_image)
         private View layoutImage;
-        @FindViewBy(id = R.id.image_like)
+        //        @FindViewBy(id = R.id.image_like)
         private ImageView imageLike;
-        @FindViewBy(id = R.id.image_avatar)
+        //        @FindViewBy(id = R.id.image_avatar)
         private ImageView imageAvatar;
 
         /**
@@ -97,7 +95,12 @@ abstract class User_View extends BaseObject implements SQModel, Parcelable {
          */
         @Override
         protected void onCreateView() {
-            AdapteredInjector.inject(this);
+            labelName = findViewById(R.id.label_name);
+            labelAboutMe = findViewById(R.id.label_about_me);
+            imageDelete = findViewById(R.id.image_delete);
+            layoutImage = findViewById(R.id.layout_image);
+            imageLike = findViewById(R.id.image_like);
+            imageAvatar = findViewById(R.id.image_avatar);
             setOnClickListeners(imageDelete, layoutImage);
         }
 

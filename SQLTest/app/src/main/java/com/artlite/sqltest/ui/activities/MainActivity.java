@@ -10,12 +10,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
 import com.artlite.adapteredrecyclerview.callbacks.OnAdapteredBaseCallback;
 import com.artlite.adapteredrecyclerview.callbacks.OnAdapteredRefreshCallback;
-import com.artlite.adapteredrecyclerview.core.AdapteredView;
-import com.artlite.adapteredrecyclerview.events.RecycleEvent;
-import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
+import com.artlite.adapteredrecyclerview.core.ARView;
+import com.artlite.adapteredrecyclerview.events.AREvent;
 import com.artlite.sqlib.callbacks.SQCursorCallback;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.log.SQLogHelper;
@@ -35,8 +33,7 @@ import java.util.List;
  */
 public class MainActivity extends BaseActivity {
 
-    @FindViewBy(id = R.id.recycler_view)
-    private AdapteredView adapteredView;
+    private ARView adapteredView;
 
     /**
      * Method which provide the getting of the layout ID for the current Activity
@@ -85,24 +82,24 @@ public class MainActivity extends BaseActivity {
      */
     @Override
     protected void onCreateActivity(Bundle bundle) {
+        adapteredView = findViewById(R.id.recycler_view);
         setTitle(R.string.text_users);
-        AdapteredInjector.inject(this);
         customizeRecycler(adapteredView);
         receiveUsers();
     }
 
     /**
-     * Method which provide the customization of the {@link AdapteredView}
+     * Method which provide the customization of the {@link ARView}
      *
-     * @param adapteredView instance of {@link AdapteredView}
+     * @param adapteredView instance of {@link ARView}
      */
-    protected void customizeRecycler(@NonNull final AdapteredView adapteredView) {
+    protected void customizeRecycler(@NonNull final ARView adapteredView) {
         adapteredView.init(new LinearLayoutManager(this), callback, refreshCallback);
         adapteredView.setIsNeedResfresh(true);
     }
 
     /**
-     * Class which provide the action when user click something inside the {@link AdapteredView}
+     * Class which provide the action when user click something inside the {@link ARView}
      */
     private final OnAdapteredBaseCallback callback = new OnAdapteredBaseCallback<User>() {
         @Override
@@ -124,7 +121,7 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void onActionReceived(@NonNull final RecycleEvent recycleEvent,
+        public void onActionReceived(@NonNull final AREvent recycleEvent,
                                      int index,
                                      @NonNull final User user) {
             if (recycleEvent.equals(User.K_DELETE_USER)) {

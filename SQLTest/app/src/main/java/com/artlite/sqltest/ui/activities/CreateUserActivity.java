@@ -10,8 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.artlite.adapteredrecyclerview.anotations.FindViewBy;
-import com.artlite.adapteredrecyclerview.helpers.AdapteredInjector;
 import com.artlite.sqlib.core.SQDatabase;
 import com.artlite.sqlib.helpers.random.SQRandomHelper;
 import com.artlite.sqlib.log.SQLogHelper;
@@ -32,13 +30,9 @@ public class CreateUserActivity extends BaseActivity {
     private static final int K_SELECT_PHOTO = 100;
     public static final String K_KEY_USER = "K_KEY_USER";
 
-    @FindViewBy(id = R.id.edit_name)
     private AppCompatEditText editName;
-    @FindViewBy(id = R.id.edit_surname)
     private AppCompatEditText editSurname;
-    @FindViewBy(id = R.id.edit_about)
     private AppCompatEditText editAbout;
-    @FindViewBy(id = R.id.imageAvatar)
     private ImageView imageAvatar;
     private User user;
     private Bitmap avatar;
@@ -58,7 +52,10 @@ public class CreateUserActivity extends BaseActivity {
      */
     @Override
     protected void onCreateActivity(Bundle bundle) {
-        AdapteredInjector.inject(this);
+        editName = findViewById(R.id.edit_name);
+        editSurname = findViewById(R.id.edit_surname);
+        editAbout = findViewById(R.id.edit_about);
+        imageAvatar = findViewById(R.id.imageAvatar);
         setOnClickListeners(imageAvatar);
         onInitUser(bundle);
     }

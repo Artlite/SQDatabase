@@ -7,7 +7,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.artlite.adapteredrecyclerview.models.BaseRecyclerItem;
+import com.artlite.adapteredrecyclerview.models.ARCell;
 import com.artlite.sqlib.annotations.SQField;
 import com.artlite.sqlib.constants.SQListType;
 import com.artlite.sqlib.helpers.model.SQModelHelper;
@@ -265,7 +265,7 @@ public class User extends User_View {
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
         if (favorite) {
-            setPriority(Priority.HIGHT);
+            setPriority(Priority.HIGH);
         } else {
             setPriority(Priority.MIDDLE);
         }
@@ -305,13 +305,13 @@ public class User extends User_View {
     }
 
     /**
-     * Method which provide the getting of the {@link BaseRecyclerItem}
+     * Method which provide the getting of the {@link ARCell}
      *
      * @param context instance of {@link Context}
-     * @return instance of {@link BaseRecyclerItem}
+     * @return instance of {@link ARCell}
      */
     @Override
-    public BaseRecyclerItem getRecyclerItem(@NonNull Context context) {
+    public ARCell<User> getRecyclerItem(@NonNull Context context) {
         return new ObjectView(context);
     }
 
